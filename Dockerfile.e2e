@@ -1,0 +1,37 @@
+# E2E test image. Built once and used for both local runs and CI.
+# Bun is layered on top of the official Playwright chromium image so
+# we don't have to manage chromium's system dependencies ourselves.
+
+FROM mcr.microsoft.com/playwright:v1.60.0-jammy
+
+# Install bun to match local dev tooling. The Playwright base image is
+# Debian-based, so apt-get works.
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl unzip ca-certificates \
+    && curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr/local bash \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install deps first so the layer is cached when only source changes.
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
+
+# Bring in everything needed to build the app and run the tests.
+COPY cucumber.cjs ./
+COPY index.html ./
+COPY vite.config.js ./
+COPY public ./public
+COPY src ./src
+COPY e2e ./e2e
+
+# Build the app once at image-build time so `docker run` is fast.
+RUN bun run build
+
+# Reports and screenshots are written here. Mount these from the host
+# to keep the artifacts outside the container.
+VOLUME ["/app/e2e/reports", "/app/e2e/screenshots"]
+
+ENTRYPOINT ["bunx", "cucumber-js"]

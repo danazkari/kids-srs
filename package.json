@@ -18,10 +18,8 @@
     "deploy:preview": "bun run build && bun --env-file=.env run surge:preview",
     "surge:only": "surge dist $SURGE_DOMAIN",
     "surge:preview": "surge dist ${SURGE_DOMAIN:-preview.surge.sh} --preview",
-    "test:e2e": "bun run build && bunx cucumber-js",
-    "test:e2e:smoke": "bun run build && bunx cucumber-js --profile smoke",
-    "test:e2e:headed": "E2E_HEADED=1 bun run build && bunx cucumber-js",
-    "test:e2e:debug": "E2E_DEBUG=1 E2E_HEADED=1 bun run build && bunx cucumber-js"
+    "test:e2e": "docker build -f Dockerfile.e2e -t kids-srs-e2e . && docker run --rm -v \"${PWD}/e2e/reports:/app/e2e/reports\" -v \"${PWD}/e2e/screenshots:/app/e2e/screenshots\" kids-srs-e2e",
+    "test:e2e:smoke": "docker build -f Dockerfile.e2e -t kids-srs-e2e . && docker run --rm -v \"${PWD}/e2e/reports:/app/e2e/reports\" -v \"${PWD}/e2e/screenshots:/app/e2e/screenshots\" kids-srs-e2e --profile smoke"
   },
   "dependencies": {
     "chart.js": "^4.4.4",

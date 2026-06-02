@@ -27,15 +27,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-      - name: Install
-        run: bun install --frozen-lockfile
-      - name: Install Playwright browser
-        run: bunx playwright install --with-deps chromium
+      - name: Build E2E image
+        run: docker build -f Dockerfile.e2e -t kids-srs-e2e .
       - name: Run E2E
-        run: bun run test:e2e
+        run: |
+          mkdir -p e2e/reports e2e/screenshots
+          docker run --rm \
+            -v "${{ github.workspace }}/e2e/reports:/app/e2e/reports" \
+            -v "${{ github.workspace }}/e2e/screenshots:/app/e2e/screenshots" \
+            kids-srs-e2e
       - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v4

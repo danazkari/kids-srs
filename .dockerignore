@@ -1,0 +1,12 @@
+node_modules
+dist
+e2e/reports
+e2e/screenshots
+.git
+.github
+coverage
+.env
+.env.*
+sample-decks
+*.log
+.eslintcache

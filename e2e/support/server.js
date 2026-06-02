@@ -100,6 +100,10 @@ export async function startServer() {
   return url;
 }
 
+export function getServerUrl() {
+  return url;
+}
+
 export async function stopServer() {
   if (!proc) return;
   proc.kill('SIGTERM');

@@ -1,5 +1,9 @@
 // Cucumber hooks: build the app, start the preview server, manage
 // the browser context, capture screenshots on failure.
+//
+// Note: `this` in BeforeAll/AfterAll is NOT the World instance —
+// cucumber-js 13 sets it to a fresh { parameters } object. State must
+// be shared via module-level exports (e.g. server.getServerUrl()).
 
 import { Before, BeforeAll, After, AfterAll, setWorldConstructor } from '@cucumber/cucumber';
 import { mkdir } from 'node:fs/promises';
@@ -15,9 +19,9 @@ setWorldConstructor(SRSWorld);
 BeforeAll({ timeout: 120_000 }, async function () {
   await mkdir(REPORTS_DIR, { recursive: true });
   await mkdir(SCREENSHOTS_DIR, { recursive: true });
-  this.serverUrl = await startServer();
+  const url = await startServer();
   if (process.env.E2E_DEBUG) {
-    process.stdout.write(`[e2e] server up at ${this.serverUrl}\n`);
+    process.stdout.write(`[e2e] server up at ${url}\n`);
   }
 });
 

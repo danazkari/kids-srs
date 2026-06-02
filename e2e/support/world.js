@@ -1,9 +1,10 @@
 // Custom World shared across all step definitions.
-// Holds the Playwright browser context, the current page, and the
-// server URL. Step definitions add helpers below.
+// Holds the Playwright browser context, the current page, and a
+// reference to the server URL exposed by e2e/support/server.js.
 
 import { World } from '@cucumber/cucumber';
 import { chromium } from 'playwright';
+import { getServerUrl } from './server.js';
 
 export class SRSWorld extends World {
   constructor(opts) {
@@ -11,8 +12,11 @@ export class SRSWorld extends World {
     this.browser = null;
     this.context = null;
     this.page = null;
-    this.serverUrl = null;
     this.screenshotOnFailure = true;
+  }
+
+  get serverUrl() {
+    return getServerUrl();
   }
 
   async openContext() {
