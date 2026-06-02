@@ -22,3 +22,15 @@ Feature: Session regressions
     And I am on the session page for the "Two phrase cards" deck
     And I grade the phrase card as "Almost"
     Then I see "Card 2 of 2"
+
+  Scenario: Kid can start a new session after abandoning one on the same day
+    When I import and activate the "two-phrase-deck" deck
+    And I am on the kid home page
+    And I click the "Two phrase cards" deck
+    And I grade the phrase card as "I knew it"
+    And I click the leave button
+    And I see the leave confirm modal
+    And I click "Leave"
+    And I click the "Two phrase cards" deck
+    Then I do not see "All done for today!"
+    And I see a study card

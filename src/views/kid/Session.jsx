@@ -46,21 +46,25 @@ export function Session({ deckId, profile, navigate }) {
         if (!d) throw new Error('Deck not found');
         if (cancelled) return;
         setDeck(d);
-        // Offer to resume same-day session
+        // Offer to resume same-day session (including abandoned ones)
         const resumable = await findResumableSession(deckId);
         const { due } = await countDue(deckId);
         if (due === 0 && !resumable) {
-          // Nothing to do; show empty state
+          // Nothing due and no session history today — show empty state
           setLoading(false);
           return;
         }
         if (resumable) {
-          // Build the queue up-front so the resume modal is layered
-          // over the card area, not the "all done" empty state. The
-          // queue is built using the resumable session's currentIndex
-          // so the user resumes on the right card.
-          await startNew(d, resumable);
-          setShowResume(true);
+          if (resumable.abandoned) {
+            // Abandoned session: skip the modal, start a fresh session
+            // immediately so the kid can study remaining cards (countDue
+            // may be 0 because prior answers are already in srsState).
+            await startNew(d, null);
+          } else {
+            // In-progress session: show resume modal.
+            await startNew(d, resumable);
+            setShowResume(true);
+          }
         } else {
           await startNew(d);
         }
@@ -335,7 +339,6 @@ export function Session({ deckId, profile, navigate }) {
       <Modal
         open={!!showResume}
         onClose={async () => {
-          // Treat dismissal as "start fresh" so the user always lands somewhere.
           const resumable = await findResumableSession(deckId);
           if (resumable)
             await updateSession(resumable.id, { completedAt: Date.now(), abandoned: true });
@@ -348,8 +351,6 @@ export function Session({ deckId, profile, navigate }) {
           <button
             class="btn"
             onClick={() => {
-              // The queue is already built with the resumable session's
-              // currentIndex. Just dismiss the modal.
               setShowResume(false);
             }}
           >
@@ -357,11 +358,7 @@ export function Session({ deckId, profile, navigate }) {
           </button>
           <button
             class="btn btn--ghost"
-            onClick={async () => {
-              const resumable = await findResumableSession(deckId);
-              if (resumable)
-                await updateSession(resumable.id, { completedAt: Date.now(), abandoned: true });
-              await startNew(deck, null);
+            onClick={() => {
               setShowResume(false);
             }}
           >

@@ -69,7 +69,9 @@ export async function reapOldIncompleteSessions() {
 }
 
 /**
- * Return the most-recent incomplete session for a deck (if any, for today).
+ * Return the most-recent session for a deck from today, regardless of
+ * whether it was completed, abandoned, or is still in progress.
+ * The caller decides how to handle each case based on the `abandoned` flag.
  */
 export async function findResumableSession(deckId) {
   const db = await getDb();
@@ -77,7 +79,7 @@ export async function findResumableSession(deckId) {
   const sessions = await db.getAllFromIndex('sessions', 'deckId', IDBKeyRange.only(deckId));
   return (
     sessions
-      .filter((s) => s.completedAt === null && s.date === today)
+      .filter((s) => s.date === today)
       .sort((a, b) => b.startedAt - a.startedAt)[0] || null
   );
 }

@@ -149,3 +149,7 @@ Then('the done screen shows the {string} badge', async function (badgeName) {
   // BadgeModal pops up ~600ms after the done screen.
   await expect(this.page.getByText(badgeName).first()).toBeVisible({ timeout: 5_000 });
 });
+
+Then('I see a study card', async function () {
+  await expect(this.page.locator('.card-area').first()).toBeVisible({ timeout: 10_000 });
+});
