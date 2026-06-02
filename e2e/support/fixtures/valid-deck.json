@@ -1,0 +1,9 @@
+{
+  "name": "Valid test deck",
+  "language": "en-US",
+  "tags": ["e2e"],
+  "cards": [
+    { "id": "a1", "type": "spelling", "prompt": "Animal", "answer": "cat" },
+    { "id": "a2", "type": "phrase", "prompt": "Greeting", "answer": "hello" }
+  ]
+}

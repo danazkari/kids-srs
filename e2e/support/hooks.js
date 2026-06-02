@@ -9,6 +9,7 @@ import { Before, BeforeAll, After, AfterAll, setWorldConstructor } from '@cucumb
 import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { SRSWorld } from './world.js';
+import { launchBrowser, closeBrowser } from './browser.js';
 import { startServer, stopServer } from './server.js';
 
 const REPORTS_DIR = 'e2e/reports';
@@ -19,6 +20,7 @@ setWorldConstructor(SRSWorld);
 BeforeAll({ timeout: 120_000 }, async function () {
   await mkdir(REPORTS_DIR, { recursive: true });
   await mkdir(SCREENSHOTS_DIR, { recursive: true });
+  await launchBrowser();
   const url = await startServer();
   if (process.env.E2E_DEBUG) {
     process.stdout.write(`[e2e] server up at ${url}\n`);
@@ -27,6 +29,7 @@ BeforeAll({ timeout: 120_000 }, async function () {
 
 AfterAll(async function () {
   await stopServer();
+  await closeBrowser();
 });
 
 Before({ timeout: 30_000 }, async function () {

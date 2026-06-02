@@ -1,0 +1,7 @@
+{
+  "name": "Missing answer",
+  "language": "en-US",
+  "cards": [
+    { "id": "a", "type": "spelling", "prompt": "A" }
+  ]
+}

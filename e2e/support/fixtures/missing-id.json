@@ -1,0 +1,7 @@
+{
+  "name": "Missing id",
+  "language": "en-US",
+  "cards": [
+    { "type": "spelling", "prompt": "A", "answer": "apple" }
+  ]
+}

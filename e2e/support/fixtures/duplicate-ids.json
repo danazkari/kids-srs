@@ -1,0 +1,8 @@
+{
+  "name": "Duplicate IDs",
+  "language": "en-US",
+  "cards": [
+    { "id": "a", "type": "spelling", "prompt": "A", "answer": "apple" },
+    { "id": "a", "type": "spelling", "prompt": "B", "answer": "banana" }
+  ]
+}

@@ -1,15 +1,18 @@
 // Custom World shared across all step definitions.
 // Holds the Playwright browser context, the current page, and a
 // reference to the server URL exposed by e2e/support/server.js.
+//
+// The browser itself is launched once per suite in e2e/support/hooks.js
+// (BeforeAll) to avoid the chromium SIGSEGV on repeated launches in
+// this container. Each scenario gets a fresh context.
 
 import { World } from '@cucumber/cucumber';
-import { chromium } from 'playwright';
+import { getBrowser } from './browser.js';
 import { getServerUrl } from './server.js';
 
 export class SRSWorld extends World {
   constructor(opts) {
     super(opts);
-    this.browser = null;
     this.context = null;
     this.page = null;
     this.screenshotOnFailure = true;
@@ -19,8 +22,11 @@ export class SRSWorld extends World {
     return getServerUrl();
   }
 
+  get browser() {
+    return getBrowser();
+  }
+
   async openContext() {
-    this.browser = await chromium.launch({ headless: true });
     this.context = await this.browser.newContext({
       viewport: { width: 414, height: 896 }, // iPhone-ish, kid device size
       deviceScaleFactor: 2,
@@ -44,14 +50,8 @@ export class SRSWorld extends World {
     } catch {
       /* ignore */
     }
-    try {
-      if (this.browser) await this.browser.close();
-    } catch {
-      /* ignore */
-    }
     this.page = null;
     this.context = null;
-    this.browser = null;
   }
 
   async clearAllStorage() {

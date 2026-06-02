@@ -1,0 +1,7 @@
+{
+  "name": "Invalid type",
+  "language": "en-US",
+  "cards": [
+    { "id": "a", "type": "bogus", "prompt": "A", "answer": "apple" }
+  ]
+}
