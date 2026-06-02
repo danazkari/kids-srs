@@ -176,6 +176,12 @@ function BootSplash() {
     <div class="screen center" style={{ flexDirection: 'column', gap: '12px' }}>
       <div style={{ fontSize: '4rem' }}>🌟</div>
       <div class="text-soft">Loading…</div>
+      <div
+        class="text-soft"
+        style={{ fontSize: '0.65rem', marginTop: '4px', letterSpacing: '0.05em' }}
+      >
+        {import.meta.env.VITE_GIT_SHA}
+      </div>
     </div>
   );
 }

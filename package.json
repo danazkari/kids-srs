@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:versioned": "VITE_GIT_SHA=$(git rev-parse --short HEAD) vite build",
     "preview": "vite preview --host",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -14,8 +15,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "deploy": "bun run build && bun --env-file=.env run surge:only",
-    "deploy:preview": "bun run build && bun --env-file=.env run surge:preview",
+    "deploy": "bun run build:versioned && bun --env-file=.env run surge:only",
+    "deploy:preview": "bun run build:versioned && bun --env-file=.env run surge:preview",
     "surge:only": "surge dist $SURGE_DOMAIN",
     "surge:preview": "surge dist ${SURGE_DOMAIN:-preview.surge.sh} --preview",
     "test:e2e": "docker build -f Dockerfile.e2e -t kids-srs-e2e . && docker run --rm -v \"${PWD}/e2e/reports:/app/e2e/reports\" -v \"${PWD}/e2e/screenshots:/app/e2e/screenshots\" kids-srs-e2e",

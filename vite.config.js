@@ -71,6 +71,9 @@ export default defineConfig({
     target: 'es2020',
     sourcemap: false
   },
+  define: {
+    'import.meta.env.VITE_GIT_SHA': JSON.stringify(process.env.VITE_GIT_SHA || 'dev')
+  },
   test: {
     environment: 'happy-dom',
     include: ['src/**/*.test.{js,jsx}'],
