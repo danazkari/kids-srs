@@ -55,6 +55,11 @@ export function Session({ deckId, profile, navigate }) {
           return;
         }
         if (resumable) {
+          // Build the queue up-front so the resume modal is layered
+          // over the card area, not the "all done" empty state. The
+          // queue is built using the resumable session's currentIndex
+          // so the user resumes on the right card.
+          await startNew(d, resumable);
           setShowResume(true);
         } else {
           await startNew(d);
@@ -100,7 +105,10 @@ export function Session({ deckId, profile, navigate }) {
   const onCardResult = useCallback(
     async (result) => {
       if (!session || !deck) return;
-      if (result.advance) {
+      // Bare `advance` (no grade) means the user clicked "Next" after
+      // a grade was already applied — spelling cards do this so the
+      // user can read the correction before moving on.
+      if (result.advance && result.grade === undefined) {
         setIndex((i) => i + 1);
         return;
       }
@@ -141,6 +149,12 @@ export function Session({ deckId, profile, navigate }) {
         correct: (updated.cardsCorrect || 0) + (updated.selfGrades?.knew || 0),
         total: updated.cardsReviewed
       });
+      // Advance to the next card. Phrase/Audio cards pass
+      // {grade, advance: true}; spelling cards omit `advance` and
+      // advance themselves after the user clicks "Next".
+      if (result.advance) {
+        setIndex((i) => i + 1);
+      }
     },
     [session, deck, queue, index]
   );
@@ -269,14 +283,14 @@ export function Session({ deckId, profile, navigate }) {
       <div class="kid-session">
         <div class="session-header">
           <div class="session-progress-row">
-            <div>{STRINGS.kid.session.cardN(index + 1, total)}</div>
+            <div>{STRINGS.kid.session.cardN(Math.min(index + 1, total), total)}</div>
             <div class="spacer" />
           </div>
           <ProgressBar value={index} max={total} label="session progress" />
         </div>
 
         <div class="card-area">
-          {card.type === 'spelling' && (
+          {card && card.type === 'spelling' && (
             <SpellingCard
               key={card.id}
               card={card}
@@ -284,11 +298,11 @@ export function Session({ deckId, profile, navigate }) {
               onResult={onCardResult}
             />
           )}
-          {card.type === 'phrase' && (
+          {card && card.type === 'phrase' && (
             <PhraseCard key={card.id} card={card} onResult={onCardResult} />
           )}
-          {card.type === 'fact' && <FactCard key={card.id} card={card} onResult={onCardResult} />}
-          {card.type === 'audio' && (
+          {card && card.type === 'fact' && <FactCard key={card.id} card={card} onResult={onCardResult} />}
+          {card && card.type === 'audio' && (
             <AudioCard
               key={card.id}
               card={card}
@@ -333,9 +347,9 @@ export function Session({ deckId, profile, navigate }) {
         <div class="row" style={{ justifyContent: 'center' }}>
           <button
             class="btn"
-            onClick={async () => {
-              const resumable = await findResumableSession(deckId);
-              await startNew(deck, resumable);
+            onClick={() => {
+              // The queue is already built with the resumable session's
+              // currentIndex. Just dismiss the modal.
               setShowResume(false);
             }}
           >
