@@ -1,11 +1,7 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'preact/hooks';
 import { getDeck, countDue } from '../../db/decks.js';
 import { getSrsForDeck, putSrs } from '../../db/srs.js';
-import {
-  createSession,
-  updateSession,
-  findResumableSession
-} from '../../db/sessions.js';
+import { createSession, updateSession, findResumableSession } from '../../db/sessions.js';
 import { listBadges, awardBadges } from '../../db/badges.js';
 import { newSrsState, applyGrade, GRADE } from '../../srs/algorithm.js';
 import { buildSessionQueue, srsMapFromList } from '../../srs/queue.js';
@@ -65,10 +61,16 @@ export function Session({ deckId, profile, navigate }) {
         }
         if (!cancelled) setLoading(false);
       } catch (e) {
-        if (!cancelled) { setError(e.message); setLoading(false); }
+        if (!cancelled) {
+          setError(e.message);
+          setLoading(false);
+        }
       }
     })();
-    return () => { cancelled = true; cancelSpeech(); };
+    return () => {
+      cancelled = true;
+      cancelSpeech();
+    };
   }, [deckId]);
 
   async function startNew(d, resumeSession = null) {
@@ -95,64 +97,71 @@ export function Session({ deckId, profile, navigate }) {
   }
 
   // Card result handler
-  const onCardResult = useCallback(async (result) => {
-    if (!session || !deck) return;
-    if (result.advance) {
-      setIndex((i) => i + 1);
-      return;
-    }
-    if (result.grade === undefined) return;
-    const card = queue[index];
-    // Update SRS state
-    const existing = srsMapRef.current.get(card.id);
-    const state = existing ? applyGrade(existing, result.grade) : applyGrade(newSrsState(card.id, deck.id), result.grade);
-    srsMapRef.current.set(card.id, state);
-    await putSrs(state);
-
-    // Update session counters
-    const newSession = { ...session };
-    newSession.cardsReviewed = (newSession.cardsReviewed || 0) + 1;
-    if (card.type === 'spelling') {
-      if (result.grade === GRADE.PASS) {
-        newSession.cardsCorrect = (newSession.cardsCorrect || 0) + 1;
-        setStreak((s) => s + 1);
-      } else {
-        setStreak(0);
+  const onCardResult = useCallback(
+    async (result) => {
+      if (!session || !deck) return;
+      if (result.advance) {
+        setIndex((i) => i + 1);
+        return;
       }
-    } else {
-      if (result.grade === GRADE.PASS) newSession.selfGrades.knew = (newSession.selfGrades.knew || 0) + 1;
-      else if (result.grade === GRADE.ALMOST) newSession.selfGrades.almost = (newSession.selfGrades.almost || 0) + 1;
-      else newSession.selfGrades.notYet = (newSession.selfGrades.notYet || 0) + 1;
-      if (result.grade === GRADE.PASS) setStreak((s) => s + 1);
-      else setStreak(0);
-    }
-    newSession.currentIndex = index + 1;
-    newSession.durationSeconds = Math.round((Date.now() - newSession.startedAt) / 1000);
-    const updated = await updateSession(newSession.id, newSession);
-    setSession(updated);
-    setStats({
-      correct: (updated.cardsCorrect || 0) + (updated.selfGrades?.knew || 0),
-      total: updated.cardsReviewed
-    });
+      if (result.grade === undefined) return;
+      const card = queue[index];
+      // Update SRS state
+      const existing = srsMapRef.current.get(card.id);
+      const state = existing
+        ? applyGrade(existing, result.grade)
+        : applyGrade(newSrsState(card.id, deck.id), result.grade);
+      srsMapRef.current.set(card.id, state);
+      await putSrs(state);
 
-    // First card badge
-    if (updated.cardsReviewed === 1) {
-      const sessions = await listSessions();
-      const decks = await listDecks();
-      const ctx = collectBadgeContext({ sessions, srsList: [], decks, lastSession: updated });
-      const eligible = computeEligibleBadgeIds(ctx);
-      const owned = await listBadges();
-      const ownedIds = new Set(owned.map((b) => b.id));
-      const newOnes = eligible.filter((id) => !ownedIds.has(id));
-      if (newOnes.length) {
-        const awarded = await awardBadges(newOnes);
-        if (awarded.length) {
-          setBadgesEarned((prev) => [...prev, ...awarded]);
-          setNewBadgesToShow(awarded);
+      // Update session counters
+      const newSession = { ...session };
+      newSession.cardsReviewed = (newSession.cardsReviewed || 0) + 1;
+      if (card.type === 'spelling') {
+        if (result.grade === GRADE.PASS) {
+          newSession.cardsCorrect = (newSession.cardsCorrect || 0) + 1;
+          setStreak((s) => s + 1);
+        } else {
+          setStreak(0);
+        }
+      } else {
+        if (result.grade === GRADE.PASS)
+          newSession.selfGrades.knew = (newSession.selfGrades.knew || 0) + 1;
+        else if (result.grade === GRADE.ALMOST)
+          newSession.selfGrades.almost = (newSession.selfGrades.almost || 0) + 1;
+        else newSession.selfGrades.notYet = (newSession.selfGrades.notYet || 0) + 1;
+        if (result.grade === GRADE.PASS) setStreak((s) => s + 1);
+        else setStreak(0);
+      }
+      newSession.currentIndex = index + 1;
+      newSession.durationSeconds = Math.round((Date.now() - newSession.startedAt) / 1000);
+      const updated = await updateSession(newSession.id, newSession);
+      setSession(updated);
+      setStats({
+        correct: (updated.cardsCorrect || 0) + (updated.selfGrades?.knew || 0),
+        total: updated.cardsReviewed
+      });
+
+      // First card badge
+      if (updated.cardsReviewed === 1) {
+        const sessions = await listSessions();
+        const decks = await listDecks();
+        const ctx = collectBadgeContext({ sessions, srsList: [], decks, lastSession: updated });
+        const eligible = computeEligibleBadgeIds(ctx);
+        const owned = await listBadges();
+        const ownedIds = new Set(owned.map((b) => b.id));
+        const newOnes = eligible.filter((id) => !ownedIds.has(id));
+        if (newOnes.length) {
+          const awarded = await awardBadges(newOnes);
+          if (awarded.length) {
+            setBadgesEarned((prev) => [...prev, ...awarded]);
+            setNewBadgesToShow(awarded);
+          }
         }
       }
-    }
-  }, [session, deck, queue, index]);
+    },
+    [session, deck, queue, index]
+  );
 
   // When the queue is finished
   useEffect(() => {
@@ -194,7 +203,13 @@ export function Session({ deckId, profile, navigate }) {
 
   // Loading / error states
   if (loading) {
-    return <div class="kid-view center"><div class="empty"><div class="emoji">⏳</div></div></div>;
+    return (
+      <div class="kid-view center">
+        <div class="empty">
+          <div class="emoji">⏳</div>
+        </div>
+      </div>
+    );
   }
   if (error) {
     return (
@@ -202,7 +217,9 @@ export function Session({ deckId, profile, navigate }) {
         <div class="empty">
           <div class="emoji">😢</div>
           <p>{error}</p>
-          <button class="btn" onClick={() => navigate('/')}>{STRINGS.kid.badges.close}</button>
+          <button class="btn" onClick={() => navigate('/')}>
+            {STRINGS.kid.badges.close}
+          </button>
         </div>
       </div>
     );
@@ -215,7 +232,9 @@ export function Session({ deckId, profile, navigate }) {
           <div class="emoji">🌟</div>
           <h2>{STRINGS.kid.home.allDone}</h2>
           <p class="text-soft">{STRINGS.kid.home.allDoneSub}</p>
-          <button class="btn btn--lg" onClick={() => navigate('/')}>← Home</button>
+          <button class="btn btn--lg" onClick={() => navigate('/')}>
+            ← Home
+          </button>
         </div>
       </div>
     );
@@ -244,7 +263,9 @@ export function Session({ deckId, profile, navigate }) {
           </div>
         </div>
         <div class="row" style={{ marginTop: '20px' }}>
-          <button class="btn btn--lg" onClick={() => navigate('/')}>{STRINGS.kid.session.doneHome}</button>
+          <button class="btn btn--lg" onClick={() => navigate('/')}>
+            {STRINGS.kid.session.doneHome}
+          </button>
         </div>
       </div>
     );
@@ -256,9 +277,13 @@ export function Session({ deckId, profile, navigate }) {
   return (
     <div class="kid-view">
       <header class="kid-top-bar">
-        <button class="icon-btn" onClick={() => setShowLeaveConfirm(true)} aria-label="home">🏠</button>
+        <button class="icon-btn" onClick={() => setShowLeaveConfirm(true)} aria-label="home">
+          🏠
+        </button>
         <div class="kid-top-bar__title">{deck.name}</div>
-        <div style={{ minWidth: '48px', textAlign: 'right' }} class="session-streak">⚡{streak}</div>
+        <div style={{ minWidth: '48px', textAlign: 'right' }} class="session-streak">
+          ⚡{streak}
+        </div>
       </header>
 
       <div class="kid-session">
@@ -272,14 +297,17 @@ export function Session({ deckId, profile, navigate }) {
 
         <div class="card-area">
           {card.type === 'spelling' && (
-            <SpellingCard key={card.id} card={card} layout={profile.settings.keyboardLayout} onResult={onCardResult} />
+            <SpellingCard
+              key={card.id}
+              card={card}
+              layout={profile.settings.keyboardLayout}
+              onResult={onCardResult}
+            />
           )}
           {card.type === 'phrase' && (
             <PhraseCard key={card.id} card={card} onResult={onCardResult} />
           )}
-          {card.type === 'fact' && (
-            <FactCard key={card.id} card={card} onResult={onCardResult} />
-          )}
+          {card.type === 'fact' && <FactCard key={card.id} card={card} onResult={onCardResult} />}
           {card.type === 'audio' && (
             <AudioCard
               key={card.id}
@@ -292,33 +320,59 @@ export function Session({ deckId, profile, navigate }) {
         </div>
       </div>
 
-      <Modal open={showLeaveConfirm} onClose={() => setShowLeaveConfirm(false)} title={STRINGS.kid.session.leaveConfirm}>
-        <p style={{ textAlign: 'center', marginBottom: '16px' }}>{STRINGS.kid.session.leaveConfirmBody}</p>
+      <Modal
+        open={showLeaveConfirm}
+        onClose={() => setShowLeaveConfirm(false)}
+        title={STRINGS.kid.session.leaveConfirm}
+      >
+        <p style={{ textAlign: 'center', marginBottom: '16px' }}>
+          {STRINGS.kid.session.leaveConfirmBody}
+        </p>
         <div class="row" style={{ justifyContent: 'center' }}>
-          <button class="btn btn--ghost" onClick={() => setShowLeaveConfirm(false)}>{STRINGS.kid.session.leaveConfirmNo}</button>
-          <button class="btn btn--orange" onClick={() => navigate('/')}>{STRINGS.kid.session.leaveConfirmYes}</button>
+          <button class="btn btn--ghost" onClick={() => setShowLeaveConfirm(false)}>
+            {STRINGS.kid.session.leaveConfirmNo}
+          </button>
+          <button class="btn btn--orange" onClick={() => navigate('/')}>
+            {STRINGS.kid.session.leaveConfirmYes}
+          </button>
         </div>
       </Modal>
 
-      <Modal open={!!showResume} onClose={async () => {
-        // Treat dismissal as "start fresh" so the user always lands somewhere.
-        const resumable = await findResumableSession(deckId);
-        if (resumable) await updateSession(resumable.id, { completedAt: Date.now(), abandoned: true });
-        await startNew(deck, null);
-        setShowResume(false);
-      }} title={STRINGS.kid.session.resumed}>
+      <Modal
+        open={!!showResume}
+        onClose={async () => {
+          // Treat dismissal as "start fresh" so the user always lands somewhere.
+          const resumable = await findResumableSession(deckId);
+          if (resumable)
+            await updateSession(resumable.id, { completedAt: Date.now(), abandoned: true });
+          await startNew(deck, null);
+          setShowResume(false);
+        }}
+        title={STRINGS.kid.session.resumed}
+      >
         <div class="row" style={{ justifyContent: 'center' }}>
-          <button class="btn" onClick={async () => {
-            const resumable = await findResumableSession(deckId);
-            await startNew(deck, resumable);
-            setShowResume(false);
-          }}>Yes, continue</button>
-          <button class="btn btn--ghost" onClick={async () => {
-            const resumable = await findResumableSession(deckId);
-            if (resumable) await updateSession(resumable.id, { completedAt: Date.now(), abandoned: true });
-            await startNew(deck, null);
-            setShowResume(false);
-          }}>Start fresh</button>
+          <button
+            class="btn"
+            onClick={async () => {
+              const resumable = await findResumableSession(deckId);
+              await startNew(deck, resumable);
+              setShowResume(false);
+            }}
+          >
+            Yes, continue
+          </button>
+          <button
+            class="btn btn--ghost"
+            onClick={async () => {
+              const resumable = await findResumableSession(deckId);
+              if (resumable)
+                await updateSession(resumable.id, { completedAt: Date.now(), abandoned: true });
+              await startNew(deck, null);
+              setShowResume(false);
+            }}
+          >
+            Start fresh
+          </button>
         </div>
       </Modal>
 

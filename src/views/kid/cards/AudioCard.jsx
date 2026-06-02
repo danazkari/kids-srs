@@ -54,10 +54,16 @@ export function AudioCard({ card, deck, audioSettings, onResult }) {
   return (
     <div class="study-card anim-fade">
       <CardMedia card={card} />
-      {card.prompt && <div class="study-card__prompt text-soft" style={{ fontSize: '0.95rem' }}>{card.prompt}</div>}
+      {card.prompt && (
+        <div class="study-card__prompt text-soft" style={{ fontSize: '0.95rem' }}>
+          {card.prompt}
+        </div>
+      )}
       <div class="study-card__answer">{card.answer}</div>
       {audioSettings.audioReplayButton && voiceReady && voice && (
-        <button class="audio-replay" onClick={replay} aria-label={STRINGS.kid.session.audioReplay}>🔊</button>
+        <button class="audio-replay" onClick={replay} aria-label={STRINGS.kid.session.audioReplay}>
+          🔊
+        </button>
       )}
       <div class="grade-row">
         <button class="grade-btn grade-btn--notyet" onClick={() => grade(0)}>

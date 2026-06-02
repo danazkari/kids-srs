@@ -7,16 +7,16 @@ import { showToast } from '../../components/toast.js';
 import { STRINGS } from '../../i18n.js';
 
 const ACCENTS = [
-  { id: 'pink',   color: '#ff85c1' },
+  { id: 'pink', color: '#ff85c1' },
   { id: 'purple', color: '#b388ff' },
-  { id: 'green',  color: '#6dd97b' },
-  { id: 'blue',   color: '#85d4ff' },
+  { id: 'green', color: '#6dd97b' },
+  { id: 'blue', color: '#85d4ff' },
   { id: 'orange', color: '#ff8c42' }
 ];
 
 const THEMES = [
-  { id: 'light',  icon: '☀️' },
-  { id: 'dark',   icon: '🌙' },
+  { id: 'light', icon: '☀️' },
+  { id: 'dark', icon: '🌙' },
   { id: 'system', icon: '🖥️' }
 ];
 
@@ -38,7 +38,14 @@ export function Settings({ profile, setProfile }) {
     setDraft((d) => ({ ...d, ...p }));
   }
   function patchSettings(p) {
-    setDraft((d) => ({ ...d, settings: { ...d.settings, ...p, sessionSize: { ...d.settings.sessionSize, ...(p.sessionSize || {}) } } }));
+    setDraft((d) => ({
+      ...d,
+      settings: {
+        ...d.settings,
+        ...p,
+        sessionSize: { ...d.settings.sessionSize, ...(p.sessionSize || {}) }
+      }
+    }));
   }
 
   // Theme + accent get saved immediately so the live preview is also
@@ -67,27 +74,41 @@ export function Settings({ profile, setProfile }) {
 
   async function setDeckVoice(deckId, voiceURI) {
     await updateDeck(deckId, { voiceURI });
-    setDecks((prev) => prev.map((d) => d.id === deckId ? { ...d, voiceURI } : d));
+    setDecks((prev) => prev.map((d) => (d.id === deckId ? { ...d, voiceURI } : d)));
   }
 
   return (
     <div>
-      <h2 class="section__title" style={{ marginBottom: '12px' }}>{STRINGS.parent.settings.title}</h2>
+      <h2 class="section__title" style={{ marginBottom: '12px' }}>
+        {STRINGS.parent.settings.title}
+      </h2>
 
       <div class="section">
-        <h3 class="section__title" style={{ fontSize: '1.05rem' }}>{STRINGS.parent.settings.profile.title}</h3>
+        <h3 class="section__title" style={{ fontSize: '1.05rem' }}>
+          {STRINGS.parent.settings.profile.title}
+        </h3>
         <div class="form-row">
           <label class="label">{STRINGS.parent.settings.profile.name}</label>
-          <input class="input" value={draft.name} onInput={(e) => patch({ name: e.currentTarget.value })} />
+          <input
+            class="input"
+            value={draft.name}
+            onInput={(e) => patch({ name: e.currentTarget.value })}
+          />
         </div>
       </div>
 
       <div class="section">
-        <h3 class="section__title" style={{ fontSize: '1.05rem' }}>{STRINGS.parent.settings.appearance.title}</h3>
+        <h3 class="section__title" style={{ fontSize: '1.05rem' }}>
+          {STRINGS.parent.settings.appearance.title}
+        </h3>
 
         <div class="form-row">
           <label class="label">{STRINGS.parent.settings.appearance.themeHeading}</label>
-          <div class="theme-pills" role="radiogroup" aria-label={STRINGS.parent.settings.appearance.themeHeading}>
+          <div
+            class="theme-pills"
+            role="radiogroup"
+            aria-label={STRINGS.parent.settings.appearance.themeHeading}
+          >
             {THEMES.map((t) => {
               const active = draft.settings.theme === t.id;
               return (
@@ -99,8 +120,16 @@ export function Settings({ profile, setProfile }) {
                   class={`theme-pill ${active ? 'is-active' : ''}`}
                   onClick={() => setTheme(t.id)}
                 >
-                  <span class="theme-pill__icon" aria-hidden="true">{t.icon}</span>
-                  <span>{STRINGS.parent.settings.appearance['theme' + t.id[0].toUpperCase() + t.id.slice(1)]}</span>
+                  <span class="theme-pill__icon" aria-hidden="true">
+                    {t.icon}
+                  </span>
+                  <span>
+                    {
+                      STRINGS.parent.settings.appearance[
+                        'theme' + t.id[0].toUpperCase() + t.id.slice(1)
+                      ]
+                    }
+                  </span>
                 </button>
               );
             })}
@@ -109,7 +138,11 @@ export function Settings({ profile, setProfile }) {
 
         <div class="form-row">
           <label class="label">{STRINGS.parent.settings.appearance.accentHeading}</label>
-          <div class="accent-swatches" role="radiogroup" aria-label={STRINGS.parent.settings.appearance.accentHeading}>
+          <div
+            class="accent-swatches"
+            role="radiogroup"
+            aria-label={STRINGS.parent.settings.appearance.accentHeading}
+          >
             {ACCENTS.map((a) => {
               const active = draft.settings.accent === a.id;
               return (
@@ -123,7 +156,9 @@ export function Settings({ profile, setProfile }) {
                   title={STRINGS.parent.settings.appearance.accentNames[a.id]}
                   onClick={() => setAccent(a.id)}
                 >
-                  <span class="sr-only">{STRINGS.parent.settings.appearance.accentNames[a.id]}</span>
+                  <span class="sr-only">
+                    {STRINGS.parent.settings.appearance.accentNames[a.id]}
+                  </span>
                 </button>
               );
             })}
@@ -132,7 +167,9 @@ export function Settings({ profile, setProfile }) {
       </div>
 
       <div class="section">
-        <h3 class="section__title" style={{ fontSize: '1.05rem' }}>{STRINGS.parent.settings.keyboard.title}</h3>
+        <h3 class="section__title" style={{ fontSize: '1.05rem' }}>
+          {STRINGS.parent.settings.keyboard.title}
+        </h3>
         <div class="row">
           <label class="radio-row" style={{ flex: 1 }}>
             <input
@@ -156,7 +193,9 @@ export function Settings({ profile, setProfile }) {
       </div>
 
       <div class="section">
-        <h3 class="section__title" style={{ fontSize: '1.05rem' }}>{STRINGS.parent.settings.session.title}</h3>
+        <h3 class="section__title" style={{ fontSize: '1.05rem' }}>
+          {STRINGS.parent.settings.session.title}
+        </h3>
         {['spelling', 'phrase', 'fact', 'audio'].map((t) => (
           <div class="form-row" key={t}>
             <label class="label">{STRINGS.parent.settings.session[t]}</label>
@@ -166,14 +205,18 @@ export function Settings({ profile, setProfile }) {
               min="0"
               max="20"
               value={draft.settings.sessionSize[t] ?? 0}
-              onInput={(e) => patchSettings({ sessionSize: { [t]: Number(e.currentTarget.value) } })}
+              onInput={(e) =>
+                patchSettings({ sessionSize: { [t]: Number(e.currentTarget.value) } })
+              }
             />
           </div>
         ))}
       </div>
 
       <div class="section">
-        <h3 class="section__title" style={{ fontSize: '1.05rem' }}>{STRINGS.parent.settings.audio.title}</h3>
+        <h3 class="section__title" style={{ fontSize: '1.05rem' }}>
+          {STRINGS.parent.settings.audio.title}
+        </h3>
         <label class="checkbox-row">
           <input
             type="checkbox"
@@ -193,7 +236,9 @@ export function Settings({ profile, setProfile }) {
       </div>
 
       <div class="section">
-        <h3 class="section__title" style={{ fontSize: '1.05rem' }}>{STRINGS.parent.settings.audio.voiceHeading}</h3>
+        <h3 class="section__title" style={{ fontSize: '1.05rem' }}>
+          {STRINGS.parent.settings.audio.voiceHeading}
+        </h3>
         {decks.length === 0 && <p class="text-soft">No decks yet.</p>}
         {decks.map((d) => (
           <DeckVoiceRow key={d.id} deck={d} onChange={(v) => setDeckVoice(d.id, v)} />
@@ -201,7 +246,9 @@ export function Settings({ profile, setProfile }) {
       </div>
 
       <div class="row" style={{ justifyContent: 'flex-end' }}>
-        <button class="btn btn--lg" onClick={save}>{STRINGS.parent.settings.save}</button>
+        <button class="btn btn--lg" onClick={save}>
+          {STRINGS.parent.settings.save}
+        </button>
       </div>
     </div>
   );
@@ -215,13 +262,17 @@ function DeckVoiceRow({ deck, onChange }) {
       const v = await getVoicesForLanguage(deck.language);
       if (!cancel) setVoices(v);
     })();
-    return () => { cancel = true; };
+    return () => {
+      cancel = true;
+    };
   }, [deck.language]);
   return (
     <div class="form-row form-row--inline" style={{ alignItems: 'center' }}>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div class="bold">{deck.name}</div>
-        <div class="text-soft" style={{ fontSize: '0.85rem' }}>{deck.language}</div>
+        <div class="text-soft" style={{ fontSize: '0.85rem' }}>
+          {deck.language}
+        </div>
       </div>
       <select
         class="select"
@@ -231,7 +282,11 @@ function DeckVoiceRow({ deck, onChange }) {
       >
         <option value="">Auto (default)</option>
         {voices.length === 0 && <option value="">{STRINGS.parent.decks.edit.noVoice}</option>}
-        {voices.map((v) => <option key={v.voiceURI} value={v.voiceURI}>{v.name}</option>)}
+        {voices.map((v) => (
+          <option key={v.voiceURI} value={v.voiceURI}>
+            {v.name}
+          </option>
+        ))}
       </select>
     </div>
   );

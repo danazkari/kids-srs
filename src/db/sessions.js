@@ -75,7 +75,9 @@ export async function findResumableSession(deckId) {
   const db = await getDb();
   const today = todayIso();
   const sessions = await db.getAllFromIndex('sessions', 'deckId', IDBKeyRange.only(deckId));
-  return sessions
-    .filter((s) => s.completedAt === null && s.date === today)
-    .sort((a, b) => b.startedAt - a.startedAt)[0] || null;
+  return (
+    sessions
+      .filter((s) => s.completedAt === null && s.date === today)
+      .sort((a, b) => b.startedAt - a.startedAt)[0] || null
+  );
 }

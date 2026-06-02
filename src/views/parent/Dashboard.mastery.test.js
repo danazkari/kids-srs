@@ -68,11 +68,11 @@ describe('computeMastery', () => {
 
   it('buckets are mutually exclusive and sum to total', () => {
     const list = [
-      srs({ cardId: 'a' }),                                                       // new
-      srs({ cardId: 'b', lastReviewed: 1, interval: 3, due: NOW + DAY }),        // learning
-      srs({ cardId: 'c', lastReviewed: 1, interval: 14, due: NOW + 7 * DAY }),    // mastered
-      srs({ cardId: 'd', lastReviewed: 1, interval: 3, due: NOW - 2 * DAY }),    // overdue
-      srs({ cardId: 'e', lastReviewed: 1, interval: 30, due: NOW - 2 * DAY })    // overdue (not mastered)
+      srs({ cardId: 'a' }), // new
+      srs({ cardId: 'b', lastReviewed: 1, interval: 3, due: NOW + DAY }), // learning
+      srs({ cardId: 'c', lastReviewed: 1, interval: 14, due: NOW + 7 * DAY }), // mastered
+      srs({ cardId: 'd', lastReviewed: 1, interval: 3, due: NOW - 2 * DAY }), // overdue
+      srs({ cardId: 'e', lastReviewed: 1, interval: 30, due: NOW - 2 * DAY }) // overdue (not mastered)
     ];
     const r = computeMastery(list, NOW);
     expect(r.new).toBe(1);

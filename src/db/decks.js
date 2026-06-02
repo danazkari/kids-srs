@@ -102,7 +102,8 @@ export function validateDeckJson(raw) {
   if (!raw || typeof raw !== 'object') throw new Error('Not a JSON object.');
   if (typeof raw.name !== 'string' || !raw.name.trim()) throw new Error('Missing deck name.');
   const cards = raw.cards;
-  if (!Array.isArray(cards) || cards.length === 0) throw new Error('Deck must include at least one card.');
+  if (!Array.isArray(cards) || cards.length === 0)
+    throw new Error('Deck must include at least one card.');
 
   const warnings = [];
   const seen = new Set();
@@ -111,17 +112,22 @@ export function validateDeckJson(raw) {
     if (typeof c.id !== 'string' || !c.id.trim()) throw new Error(`Card #${i + 1}: missing id.`);
     if (seen.has(c.id)) throw new Error(`Card #${i + 1}: duplicate id "${c.id}".`);
     seen.add(c.id);
-    if (!CARD_TYPES.has(c.type)) throw new Error(`Card #${i + 1}: type must be one of spelling|phrase|fact|audio.`);
-    if (typeof c.answer !== 'string' || !c.answer.length) throw new Error(`Card #${i + 1}: missing answer.`);
-    let image = c.image ?? null;
-    if (image && typeof image !== 'string') throw new Error(`Card #${i + 1}: image must be a string or null.`);
+    if (!CARD_TYPES.has(c.type))
+      throw new Error(`Card #${i + 1}: type must be one of spelling|phrase|fact|audio.`);
+    if (typeof c.answer !== 'string' || !c.answer.length)
+      throw new Error(`Card #${i + 1}: missing answer.`);
+    const image = c.image ?? null;
+    if (image && typeof image !== 'string')
+      throw new Error(`Card #${i + 1}: image must be a string or null.`);
     if (image && image.startsWith('data:image/')) {
       // Approximate byte length.
       const comma = image.indexOf(',');
       const b64 = comma >= 0 ? image.slice(comma + 1) : image;
       const bytes = Math.floor(b64.length * 0.75);
       if (bytes > MAX_BASE64_IMAGE_BYTES) {
-        warnings.push(`Card #${i + 1}: image is ${Math.round(bytes / 1024)} KB — consider using a URL.`);
+        warnings.push(
+          `Card #${i + 1}: image is ${Math.round(bytes / 1024)} KB — consider using a URL.`
+        );
       }
     }
     return {
@@ -138,7 +144,9 @@ export function validateDeckJson(raw) {
     deck: {
       name: raw.name.trim(),
       language: typeof raw.language === 'string' ? raw.language : 'en-US',
-      tags: Array.isArray(raw.tags) ? raw.tags.filter((t) => typeof t === 'string' && t.trim()).map((t) => t.trim()) : [],
+      tags: Array.isArray(raw.tags)
+        ? raw.tags.filter((t) => typeof t === 'string' && t.trim()).map((t) => t.trim())
+        : [],
       cards: normalized
     },
     warnings

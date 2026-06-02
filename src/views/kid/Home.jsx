@@ -22,7 +22,9 @@ export function Home({ profile, navigate }) {
     setLoading(false);
   }, []);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   function goToParent() {
     navigate('/parent/overview');
@@ -33,7 +35,9 @@ export function Home({ profile, navigate }) {
   return (
     <div class="kid-view">
       <header class="kid-top-bar">
-        <button class="icon-btn" onClick={goToParent} aria-label="parent dashboard" title="Parent">🔒</button>
+        <button class="icon-btn" onClick={goToParent} aria-label="parent dashboard" title="Parent">
+          🔒
+        </button>
         <div class="kid-top-bar__title">🌟 {STRINGS.app.name}</div>
         <span style={{ width: '48px' }} />
       </header>
@@ -45,7 +49,9 @@ export function Home({ profile, navigate }) {
         </div>
 
         {loading ? (
-          <div class="empty"><div class="emoji">⏳</div></div>
+          <div class="empty">
+            <div class="emoji">⏳</div>
+          </div>
         ) : decks.length === 0 ? (
           <div class="all-done-card">
             <div class="emoji">📭</div>
@@ -87,10 +93,14 @@ export function Home({ profile, navigate }) {
                         <span class="chip chip--green">✅ {STRINGS.kid.home.allDoneCta}</span>
                       )}
                       {c.newCount > 0 && hasDue && (
-                        <span class="chip chip--accent">{STRINGS.kid.home.newCards(c.newCount)}</span>
+                        <span class="chip chip--accent">
+                          {STRINGS.kid.home.newCards(c.newCount)}
+                        </span>
                       )}
                       {d.tags?.slice(0, 2).map((t) => (
-                        <span key={t} class="chip chip--secondary">#{t}</span>
+                        <span key={t} class="chip chip--secondary">
+                          #{t}
+                        </span>
                       ))}
                     </div>
                   </div>
@@ -102,7 +112,9 @@ export function Home({ profile, navigate }) {
                       {STRINGS.kid.home.startSession}
                     </button>
                   ) : (
-                    <span class="deck-card__cta deck-card__cta--done" aria-disabled="true">✅</span>
+                    <span class="deck-card__cta deck-card__cta--done" aria-disabled="true">
+                      ✅
+                    </span>
                   )}
                 </div>
               );
@@ -114,7 +126,9 @@ export function Home({ profile, navigate }) {
           🏅 {STRINGS.kid.home.badgesButton} ({badges.length})
         </button>
         <div class="parent-link">
-          <button class="text-link" onClick={goToParent}>{STRINGS.kid.home.parentLink}</button>
+          <button class="text-link" onClick={goToParent}>
+            {STRINGS.kid.home.parentLink}
+          </button>
         </div>
       </div>
 

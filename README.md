@@ -72,10 +72,24 @@ sample-decks/            ready-to-import JSON decks for testing
   "language": "en-US",
   "tags": ["tag1", "tag2"],
   "cards": [
-    { "id": "sp01", "type": "spelling", "emoji": "🐱", "image": null, "prompt": "Hint", "answer": "word" },
-    { "id": "au01", "type": "audio",    "emoji": "🍎", "image": null, "prompt": "apple", "answer": "une pomme" },
-    { "id": "ph01", "type": "phrase",   "emoji": "💡", "image": null, "prompt": "Q?",     "answer": "A" },
-    { "id": "fa01", "type": "fact",     "emoji": "🦴", "image": null, "prompt": "Q?",     "answer": "A" }
+    {
+      "id": "sp01",
+      "type": "spelling",
+      "emoji": "🐱",
+      "image": null,
+      "prompt": "Hint",
+      "answer": "word"
+    },
+    {
+      "id": "au01",
+      "type": "audio",
+      "emoji": "🍎",
+      "image": null,
+      "prompt": "apple",
+      "answer": "une pomme"
+    },
+    { "id": "ph01", "type": "phrase", "emoji": "💡", "image": null, "prompt": "Q?", "answer": "A" },
+    { "id": "fa01", "type": "fact", "emoji": "🦴", "image": null, "prompt": "Q?", "answer": "A" }
   ]
 }
 ```

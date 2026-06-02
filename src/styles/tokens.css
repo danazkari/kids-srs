@@ -36,7 +36,7 @@
   --radius-xl: 48px;
 
   --shadow-sm: 0 2px 8px rgba(100, 60, 160, 0.08);
-  --shadow: 0 8px 32px rgba(100, 60, 160, 0.10);
+  --shadow: 0 8px 32px rgba(100, 60, 160, 0.1);
   --shadow-lg: 0 16px 48px rgba(100, 60, 160, 0.16);
 
   --space-1: 4px;
@@ -72,11 +72,11 @@
 /* =============================================================
    Dark theme — keeps the same accent; flips neutrals + shadows
    ============================================================= */
-[data-theme="dark"] {
+[data-theme='dark'] {
   --bg: #1a1226;
   --surface: #261b3a;
-  --primary-light: #3a2547;   /* dark tint for backgrounds */
-  --primary-dark: #ffa3d0;    /* lighter for hover */
+  --primary-light: #3a2547; /* dark tint for backgrounds */
+  --primary-dark: #ffa3d0; /* lighter for hover */
   --secondary-light: #1f3a52;
   --accent-light: #3d3520;
   --green-light: #1f3a25;
@@ -96,22 +96,22 @@
 /* =============================================================
    Accent palettes (light theme) — only changes the primary
    ============================================================= */
-[data-accent="purple"] {
+[data-accent='purple'] {
   --primary: #b388ff;
   --primary-light: #ebe0ff;
   --primary-dark: #9166e0;
 }
-[data-accent="green"] {
+[data-accent='green'] {
   --primary: #6dd97b;
   --primary-light: #d8f8dc;
   --primary-dark: #4fbf5f;
 }
-[data-accent="blue"] {
+[data-accent='blue'] {
   --primary: #85d4ff;
   --primary-light: #d6f0ff;
   --primary-dark: #5cb8e8;
 }
-[data-accent="orange"] {
+[data-accent='orange'] {
   --primary: #ff8c42;
   --primary-light: #ffe0cc;
   --primary-dark: #e07028;
@@ -120,19 +120,19 @@
 /* =============================================================
    Accent palettes in dark mode — different tints needed
    ============================================================= */
-[data-theme="dark"][data-accent="purple"] {
+[data-theme='dark'][data-accent='purple'] {
   --primary-light: #2e1f4a;
   --primary-dark: #d0b3ff;
 }
-[data-theme="dark"][data-accent="green"] {
+[data-theme='dark'][data-accent='green'] {
   --primary-light: #1f3a25;
   --primary-dark: #95e8a3;
 }
-[data-theme="dark"][data-accent="blue"] {
+[data-theme='dark'][data-accent='blue'] {
   --primary-light: #1f3a52;
   --primary-dark: #b3e1ff;
 }
-[data-theme="dark"][data-accent="orange"] {
+[data-theme='dark'][data-accent='orange'] {
   --primary-light: #3d2818;
   --primary-dark: #ffae7a;
 }

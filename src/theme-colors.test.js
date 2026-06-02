@@ -36,9 +36,13 @@ describe('accent color map', () => {
   });
 
   it('JS export has all 5 expected accent keys', () => {
-    expect(Object.keys(ACCENT_COLORS).sort()).toEqual(
-      ['blue', 'green', 'orange', 'pink', 'purple']
-    );
+    expect(Object.keys(ACCENT_COLORS).sort()).toEqual([
+      'blue',
+      'green',
+      'orange',
+      'pink',
+      'purple'
+    ]);
   });
 
   it('every value is a 7-char hex color starting with #', () => {

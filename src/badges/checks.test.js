@@ -84,24 +84,32 @@ describe('evaluatePerfectSession', () => {
     expect(evaluatePerfectSession({ lastSession: null })).toBe(false);
   });
   it('false when 0 cards reviewed', () => {
-    expect(evaluatePerfectSession({
-      lastSession: { cardsReviewed: 0, cardsCorrect: 0, selfGrades: { knew: 0 } }
-    })).toBe(false);
+    expect(
+      evaluatePerfectSession({
+        lastSession: { cardsReviewed: 0, cardsCorrect: 0, selfGrades: { knew: 0 } }
+      })
+    ).toBe(false);
   });
   it('true when all correct (spelling path)', () => {
-    expect(evaluatePerfectSession({
-      lastSession: { cardsReviewed: 5, cardsCorrect: 5, selfGrades: { knew: 0 } }
-    })).toBe(true);
+    expect(
+      evaluatePerfectSession({
+        lastSession: { cardsReviewed: 5, cardsCorrect: 5, selfGrades: { knew: 0 } }
+      })
+    ).toBe(true);
   });
   it('true when all correct (self-grade path)', () => {
-    expect(evaluatePerfectSession({
-      lastSession: { cardsReviewed: 5, cardsCorrect: 0, selfGrades: { knew: 5 } }
-    })).toBe(true);
+    expect(
+      evaluatePerfectSession({
+        lastSession: { cardsReviewed: 5, cardsCorrect: 0, selfGrades: { knew: 5 } }
+      })
+    ).toBe(true);
   });
   it('false when some were missed', () => {
-    expect(evaluatePerfectSession({
-      lastSession: { cardsReviewed: 5, cardsCorrect: 3, selfGrades: { knew: 1 } }
-    })).toBe(false);
+    expect(
+      evaluatePerfectSession({
+        lastSession: { cardsReviewed: 5, cardsCorrect: 3, selfGrades: { knew: 1 } }
+      })
+    ).toBe(false);
   });
 });
 

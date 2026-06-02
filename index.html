@@ -27,8 +27,10 @@
           var theme = (pref && pref.theme) || 'light';
           var accent = (pref && pref.accent) || 'pink';
           if (theme === 'system') {
-            theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-              ? 'dark' : 'light';
+            theme =
+              window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
           }
           document.documentElement.setAttribute('data-theme', theme);
           document.documentElement.setAttribute('data-accent', accent);

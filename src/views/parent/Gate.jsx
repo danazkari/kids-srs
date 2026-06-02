@@ -19,7 +19,9 @@ export function Gate({ onSuccess, onCancel }) {
   const [now, setNow] = useState(Date.now());
   const inputRef = useRef(null);
 
-  useEffect(() => { inputRef.current && inputRef.current.focus(); }, [q]);
+  useEffect(() => {
+    inputRef.current && inputRef.current.focus();
+  }, [q]);
 
   useEffect(() => {
     if (!cooldownUntil) return;
@@ -67,7 +69,9 @@ export function Gate({ onSuccess, onCancel }) {
         <div style={{ fontSize: '3rem' }}>🔒</div>
         <h1>{STRINGS.parent.gate.title}</h1>
         <p class="text-soft">{STRINGS.parent.gate.subtitle}</p>
-        <div class="gate-card__question">{q.a} × {q.b} = ?</div>
+        <div class="gate-card__question">
+          {q.a} × {q.b} = ?
+        </div>
         <input
           ref={inputRef}
           class="input gate-card__input"
@@ -76,15 +80,33 @@ export function Gate({ onSuccess, onCancel }) {
           autocomplete="off"
           value={val}
           onInput={(e) => setVal(e.currentTarget.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') check(); }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') check();
+          }}
           disabled={locked}
         />
-        {feedback === 'good' && <div class="gate-card__feedback gate-card__feedback--good">{STRINGS.parent.gate.correct}</div>}
-        {feedback === 'bad' && !locked && <div class="gate-card__feedback gate-card__feedback--bad">{STRINGS.parent.gate.wrong}</div>}
-        {locked && <div class="gate-card__feedback gate-card__feedback--bad">{STRINGS.parent.gate.lockedOut} {remaining}s</div>}
+        {feedback === 'good' && (
+          <div class="gate-card__feedback gate-card__feedback--good">
+            {STRINGS.parent.gate.correct}
+          </div>
+        )}
+        {feedback === 'bad' && !locked && (
+          <div class="gate-card__feedback gate-card__feedback--bad">
+            {STRINGS.parent.gate.wrong}
+          </div>
+        )}
+        {locked && (
+          <div class="gate-card__feedback gate-card__feedback--bad">
+            {STRINGS.parent.gate.lockedOut} {remaining}s
+          </div>
+        )}
         <div class="row" style={{ justifyContent: 'center' }}>
-          <button class="btn" onClick={check} disabled={locked || !val}>Check</button>
-          <button class="btn btn--ghost" onClick={onCancel}>{STRINGS.parent.gate.back}</button>
+          <button class="btn" onClick={check} disabled={locked || !val}>
+            Check
+          </button>
+          <button class="btn btn--ghost" onClick={onCancel}>
+            {STRINGS.parent.gate.back}
+          </button>
         </div>
       </div>
     </div>

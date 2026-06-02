@@ -16,7 +16,9 @@ export function ToastHost() {
   return (
     <div class="toast-host" aria-live="polite">
       {toasts.map((t) => (
-        <div key={t.id} class={`toast toast--${t.variant}`}>{t.message}</div>
+        <div key={t.id} class={`toast toast--${t.variant}`}>
+          {t.message}
+        </div>
       ))}
     </div>
   );

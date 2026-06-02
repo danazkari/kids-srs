@@ -6,7 +6,11 @@ import { useState } from 'preact/hooks';
 export function CardMedia({ card, emojiSize = '4rem' }) {
   const [imageFailed, setImageFailed] = useState(false);
   if (card.emoji && !card.image) {
-    return <div class="study-card__emoji" style={{ fontSize: emojiSize }}>{card.emoji}</div>;
+    return (
+      <div class="study-card__emoji" style={{ fontSize: emojiSize }}>
+        {card.emoji}
+      </div>
+    );
   }
   if (card.image && !imageFailed) {
     return (
@@ -21,7 +25,15 @@ export function CardMedia({ card, emojiSize = '4rem' }) {
     );
   }
   if (card.emoji) {
-    return <div class="study-card__image--placeholder" aria-hidden="true">{card.emoji}</div>;
+    return (
+      <div class="study-card__image--placeholder" aria-hidden="true">
+        {card.emoji}
+      </div>
+    );
   }
-  return <div class="study-card__image--placeholder" aria-hidden="true">🖼️</div>;
+  return (
+    <div class="study-card__image--placeholder" aria-hidden="true">
+      🖼️
+    </div>
+  );
 }

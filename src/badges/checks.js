@@ -38,8 +38,11 @@ export function evaluateCardsTotal({ totalCardsReviewed }, target) {
 export function evaluatePerfectSession({ lastSession }) {
   if (!lastSession) return false;
   if (lastSession.cardsReviewed === 0) return false;
-  if (lastSession.cardsCorrect + (lastSession.selfGrades?.knew || 0) !== lastSession.cardsReviewed) return false;
-  return lastSession.cardsCorrect + (lastSession.selfGrades?.knew || 0) === lastSession.cardsReviewed;
+  if (lastSession.cardsCorrect + (lastSession.selfGrades?.knew || 0) !== lastSession.cardsReviewed)
+    return false;
+  return (
+    lastSession.cardsCorrect + (lastSession.selfGrades?.knew || 0) === lastSession.cardsReviewed
+  );
 }
 
 export function evaluateFrenchFirst({ completedFrenchAudioCount }) {

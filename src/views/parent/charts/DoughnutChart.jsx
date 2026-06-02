@@ -31,7 +31,12 @@ export function DoughnutChart({ data, options = {}, height = 220, className = ''
         ...options
       }
     });
-    return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };
+    return () => {
+      if (chartRef.current) {
+        chartRef.current.destroy();
+        chartRef.current = null;
+      }
+    };
   }, [JSON.stringify(data)]);
   return (
     <div class={`metric__chart ${className}`} style={{ height: `${height}px` }}>

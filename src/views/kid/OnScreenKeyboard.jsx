@@ -5,15 +5,15 @@
 import { useEffect, useMemo, useRef } from 'preact/hooks';
 
 const QWERTY_ROWS = [
-  ['q','w','e','r','t','y','u','i','o','p'],
-  ['a','s','d','f','g','h','j','k','l'],
-  ['z','x','c','v','b','n','m']
+  ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+  ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+  ['z', 'x', 'c', 'v', 'b', 'n', 'm']
 ];
 
 const ABC_ROWS = [
-  ['a','b','c','d','e','f','g','h','i','j'],
-  ['k','l','m','n','o','p','q','r','s','t'],
-  ['u','v','w','x','y','z']
+  ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'],
+  ['k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't'],
+  ['u', 'v', 'w', 'x', 'y', 'z']
 ];
 
 export function OnScreenKeyboard({ layout = 'qwerty', onKey, hiddenInputRef, disabled = false }) {
@@ -41,18 +41,66 @@ export function OnScreenKeyboard({ layout = 'qwerty', onKey, hiddenInputRef, dis
           <div key={i} class="osk-row">
             {i === rows.length - 1 && layout === 'qwerty' ? (
               <>
-                <Key label="⌫" cls="osk-key--back" onClick={() => tapKey('Backspace')} disabled={disabled} title="Backspace" />
-                {row.map((k) => <Key key={k} label={k} onClick={() => tapKey(k)} disabled={disabled} pressed={pressedRef.current === k} />)}
-                <Key label="↵" cls="osk-key--enter" onClick={() => tapKey('Enter')} disabled={disabled} title="Submit" />
+                <Key
+                  label="⌫"
+                  cls="osk-key--back"
+                  onClick={() => tapKey('Backspace')}
+                  disabled={disabled}
+                  title="Backspace"
+                />
+                {row.map((k) => (
+                  <Key
+                    key={k}
+                    label={k}
+                    onClick={() => tapKey(k)}
+                    disabled={disabled}
+                    pressed={pressedRef.current === k}
+                  />
+                ))}
+                <Key
+                  label="↵"
+                  cls="osk-key--enter"
+                  onClick={() => tapKey('Enter')}
+                  disabled={disabled}
+                  title="Submit"
+                />
               </>
             ) : i === rows.length - 1 && layout === 'abc' ? (
               <>
-                <Key label="⌫" cls="osk-key--back" onClick={() => tapKey('Backspace')} disabled={disabled} title="Backspace" />
-                {row.map((k) => <Key key={k} label={k} onClick={() => tapKey(k)} disabled={disabled} pressed={pressedRef.current === k} />)}
-                <Key label="↵" cls="osk-key--enter" onClick={() => tapKey('Enter')} disabled={disabled} title="Submit" />
+                <Key
+                  label="⌫"
+                  cls="osk-key--back"
+                  onClick={() => tapKey('Backspace')}
+                  disabled={disabled}
+                  title="Backspace"
+                />
+                {row.map((k) => (
+                  <Key
+                    key={k}
+                    label={k}
+                    onClick={() => tapKey(k)}
+                    disabled={disabled}
+                    pressed={pressedRef.current === k}
+                  />
+                ))}
+                <Key
+                  label="↵"
+                  cls="osk-key--enter"
+                  onClick={() => tapKey('Enter')}
+                  disabled={disabled}
+                  title="Submit"
+                />
               </>
             ) : (
-              row.map((k) => <Key key={k} label={k} onClick={() => tapKey(k)} disabled={disabled} pressed={pressedRef.current === k} />)
+              row.map((k) => (
+                <Key
+                  key={k}
+                  label={k}
+                  onClick={() => tapKey(k)}
+                  disabled={disabled}
+                  pressed={pressedRef.current === k}
+                />
+              ))
             )}
           </div>
         ))}
@@ -76,9 +124,17 @@ export function OnScreenKeyboard({ layout = 'qwerty', onKey, hiddenInputRef, dis
         onKeyDown={(e) => {
           // Suppress native keys (don't insert into the field).
           e.preventDefault();
-          if (e.key === 'Backspace') { tapKey('Backspace'); return; }
-          if (e.key === 'Enter') { tapKey('Enter'); return; }
-          if (/^[a-zA-Z]$/.test(e.key)) { tapKey(e.key.toLowerCase()); }
+          if (e.key === 'Backspace') {
+            tapKey('Backspace');
+            return;
+          }
+          if (e.key === 'Enter') {
+            tapKey('Enter');
+            return;
+          }
+          if (/^[a-zA-Z]$/.test(e.key)) {
+            tapKey(e.key.toLowerCase());
+          }
         }}
       />
     </div>
@@ -90,7 +146,10 @@ function Key({ label, cls = '', onClick, disabled, pressed, title }) {
     <button
       type="button"
       class={`osk-key ${cls} ${pressed ? 'is-pressed' : ''}`}
-      onClick={(e) => { e.preventDefault(); onClick && onClick(); }}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick && onClick();
+      }}
       disabled={disabled}
       title={title}
       aria-label={title || label}

@@ -4,9 +4,9 @@ const DAY_MS = 86_400_000;
 export const MIN_EASE = 1.3;
 
 export const GRADE = {
-  FAIL: 0,    // "not yet"
-  ALMOST: 1,  // "almost"
-  PASS: 2     // "I knew it"
+  FAIL: 0, // "not yet"
+  ALMOST: 1, // "almost"
+  PASS: 2 // "I knew it"
 };
 
 /**
@@ -86,8 +86,14 @@ export function letterCompare(userAnswer, correctAnswer) {
   const result = [];
   for (let i = 0; i < correctChars.length; i++) {
     if (i < userChars.length) {
-      const u = userChars[i].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-      const c = correctChars[i].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const u = userChars[i]
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+      const c = correctChars[i]
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
       result.push({ char: correctChars[i], status: u === c ? 'correct' : 'wrong' });
     } else {
       result.push({ char: correctChars[i], status: 'missing' });

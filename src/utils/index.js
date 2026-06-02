@@ -58,5 +58,5 @@ export function formatDuration(seconds) {
 }
 
 export function pluralize(n, singular, plural) {
-  return `${n} ${n === 1 ? singular : (plural || singular + 's')}`;
+  return `${n} ${n === 1 ? singular : plural || singular + 's'}`;
 }

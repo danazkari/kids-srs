@@ -33,11 +33,15 @@ function _apply(theme, accent) {
       const meta = document.querySelector('meta[name="theme-color"]');
       if (meta) meta.setAttribute('content', primary);
     }
-  } catch {}
+  } catch {
+    /* ignore */
+  }
   // Persist a small sync hint for the pre-paint script in index.html.
   try {
     localStorage.setItem('srs-kids-theme', JSON.stringify({ theme, accent: safeAccent }));
-  } catch {}
+  } catch {
+    /* ignore */
+  }
 }
 
 function watchSystemTheme(onChange) {

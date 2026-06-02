@@ -97,7 +97,11 @@ export function speak(text, opts = {}) {
 
 export function cancelSpeech() {
   if (isSupported()) {
-    try { window.speechSynthesis.cancel(); } catch {}
+    try {
+      window.speechSynthesis.cancel();
+    } catch {
+      /* ignore */
+    }
   }
 }
 

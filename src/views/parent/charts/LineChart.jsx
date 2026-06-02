@@ -15,7 +15,9 @@ export function LineChart({ data, options = {}, height = 220, className = '' }) 
         ...data,
         datasets: (data.datasets || []).map((ds, i) => ({
           borderColor: ds.color || palette(8)[i],
-          backgroundColor: ds.fill ? (ds.fillColor || (ds.color || palette(8)[i]) + '33') : 'transparent',
+          backgroundColor: ds.fill
+            ? ds.fillColor || (ds.color || palette(8)[i]) + '33'
+            : 'transparent',
           borderWidth: 2.5,
           pointRadius: 3,
           pointHoverRadius: 5,
@@ -28,7 +30,11 @@ export function LineChart({ data, options = {}, height = 220, className = '' }) 
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: data.datasets?.length > 1, position: 'bottom', labels: { boxWidth: 12, padding: 12 } },
+          legend: {
+            display: data.datasets?.length > 1,
+            position: 'bottom',
+            labels: { boxWidth: 12, padding: 12 }
+          },
           tooltip: { backgroundColor: '#3a2d4f', padding: 10, cornerRadius: 8 }
         },
         scales: {
@@ -38,7 +44,12 @@ export function LineChart({ data, options = {}, height = 220, className = '' }) 
         ...options
       }
     });
-    return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };
+    return () => {
+      if (chartRef.current) {
+        chartRef.current.destroy();
+        chartRef.current = null;
+      }
+    };
   }, [JSON.stringify(data)]);
   return (
     <div class={`metric__chart ${className}`} style={{ height: `${height}px` }}>

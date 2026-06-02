@@ -37,7 +37,9 @@ export function Decks() {
     setAllTags([...tags].sort());
   }
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => {
+    refresh();
+  }, []);
 
   const filtered = decks.filter((d) => {
     if (statusFilter === 'active') return d.status === 'active';
@@ -49,7 +51,9 @@ export function Decks() {
     <div>
       <div class="section__head">
         <h2 class="section__title">{STRINGS.parent.decks.title}</h2>
-        <button class="btn" onClick={() => setAdding(true)}>+ {STRINGS.parent.decks.addButton}</button>
+        <button class="btn" onClick={() => setAdding(true)}>
+          + {STRINGS.parent.decks.addButton}
+        </button>
       </div>
 
       <div class="row" style={{ marginBottom: '12px' }}>
@@ -59,7 +63,9 @@ export function Decks() {
               key={s}
               class={`range-pills__btn ${statusFilter === s ? 'is-active' : ''}`}
               onClick={() => setStatusFilter(s)}
-            >{STRINGS.parent.decks.filters[s]}</button>
+            >
+              {STRINGS.parent.decks.filters[s]}
+            </button>
           ))}
         </div>
       </div>
@@ -80,7 +86,10 @@ export function Decks() {
               due={dueMap[d.id]?.due || 0}
               onEdit={() => setEditing(d)}
               onDelete={() => setDeleting(d)}
-              onArchive={async () => { await archiveDeck(d.id, d.status !== 'archived'); await refresh(); }}
+              onArchive={async () => {
+                await archiveDeck(d.id, d.status !== 'archived');
+                await refresh();
+              }}
               onReplace={() => setReplacing(d)}
               onDownload={() => downloadDeck(d)}
             />
@@ -88,10 +97,45 @@ export function Decks() {
         </div>
       )}
 
-      {adding && <AddDeckModal onClose={() => setAdding(false)} onCreated={async () => { setAdding(false); await refresh(); }} />}
-      {editing && <EditDeckModal deck={editing} onClose={() => setEditing(null)} onSaved={async () => { setEditing(null); await refresh(); }} />}
-      {deleting && <DeleteDeckModal deck={deleting} onClose={() => setDeleting(null)} onDeleted={async () => { setDeleting(null); await refresh(); }} />}
-      {replacing && <ReplaceCardsModal deck={replacing} onClose={() => setReplacing(null)} onReplaced={async () => { setReplacing(null); await refresh(); }} />}
+      {adding && (
+        <AddDeckModal
+          onClose={() => setAdding(false)}
+          onCreated={async () => {
+            setAdding(false);
+            await refresh();
+          }}
+        />
+      )}
+      {editing && (
+        <EditDeckModal
+          deck={editing}
+          onClose={() => setEditing(null)}
+          onSaved={async () => {
+            setEditing(null);
+            await refresh();
+          }}
+        />
+      )}
+      {deleting && (
+        <DeleteDeckModal
+          deck={deleting}
+          onClose={() => setDeleting(null)}
+          onDeleted={async () => {
+            setDeleting(null);
+            await refresh();
+          }}
+        />
+      )}
+      {replacing && (
+        <ReplaceCardsModal
+          deck={replacing}
+          onClose={() => setReplacing(null)}
+          onReplaced={async () => {
+            setReplacing(null);
+            await refresh();
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -102,24 +146,47 @@ function DeckAdminCard({ deck, due, onEdit, onDelete, onArchive, onReplace, onDo
     <div class={`deck-card-admin ${isArchived ? 'deck-card-admin--archived' : ''}`}>
       <div class="deck-card-admin__head">
         <div>
-          <div class="deck-card-admin__name">{deck.name} {isArchived && <span class="chip">archived</span>}</div>
+          <div class="deck-card-admin__name">
+            {deck.name} {isArchived && <span class="chip">archived</span>}
+          </div>
           <div class="deck-card-admin__meta">
             {deck.language} • {deck.cards.length} cards
-            {due > 0 && <> • <span class="chip chip--accent">{due} due</span></>}
+            {due > 0 && (
+              <>
+                {' '}
+                • <span class="chip chip--accent">{due} due</span>
+              </>
+            )}
           </div>
           {deck.tags?.length > 0 && (
             <div class="row row--tight" style={{ marginTop: '6px' }}>
-              {deck.tags.map((t) => <span key={t} class="chip chip--secondary">#{t}</span>)}
+              {deck.tags.map((t) => (
+                <span key={t} class="chip chip--secondary">
+                  #{t}
+                </span>
+              ))}
             </div>
           )}
         </div>
       </div>
       <div class="deck-card-admin__actions">
-        <button class="btn btn--small" onClick={onEdit}>{STRINGS.parent.decks.actions.edit}</button>
-        <button class="btn btn--small btn--ghost" onClick={onDownload}>{STRINGS.parent.decks.actions.download}</button>
-        <button class="btn btn--small btn--ghost" onClick={onArchive}>{isArchived ? STRINGS.parent.decks.actions.unarchive : STRINGS.parent.decks.actions.archive}</button>
-        <button class="btn btn--small btn--ghost" onClick={onReplace}>{STRINGS.parent.decks.actions.replace}</button>
-        <button class="btn btn--small btn--orange" onClick={onDelete}>{STRINGS.parent.decks.actions.delete}</button>
+        <button class="btn btn--small" onClick={onEdit}>
+          {STRINGS.parent.decks.actions.edit}
+        </button>
+        <button class="btn btn--small btn--ghost" onClick={onDownload}>
+          {STRINGS.parent.decks.actions.download}
+        </button>
+        <button class="btn btn--small btn--ghost" onClick={onArchive}>
+          {isArchived
+            ? STRINGS.parent.decks.actions.unarchive
+            : STRINGS.parent.decks.actions.archive}
+        </button>
+        <button class="btn btn--small btn--ghost" onClick={onReplace}>
+          {STRINGS.parent.decks.actions.replace}
+        </button>
+        <button class="btn btn--small btn--orange" onClick={onDelete}>
+          {STRINGS.parent.decks.actions.delete}
+        </button>
       </div>
     </div>
   );
@@ -174,7 +241,8 @@ function AddDeckModal({ onClose, onCreated }) {
         return;
       }
       await createDeck(parsed);
-      if (warnings.length) showToast(`${warnings.length} warning(s) — check deck`, { variant: 'warn' });
+      if (warnings.length)
+        showToast(`${warnings.length} warning(s) — check deck`, { variant: 'warn' });
       onCreated && onCreated();
     } catch (e) {
       setErr(e.message);
@@ -187,7 +255,10 @@ function AddDeckModal({ onClose, onCreated }) {
       <div
         class="dropzone"
         onClick={() => inputRef.current && inputRef.current.click()}
-        onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('is-dragover'); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.currentTarget.classList.add('is-dragover');
+        }}
         onDragLeave={(e) => e.currentTarget.classList.remove('is-dragover')}
         onDrop={(e) => {
           e.preventDefault();
@@ -202,24 +273,34 @@ function AddDeckModal({ onClose, onCreated }) {
           ref={inputRef}
           type="file"
           accept="application/json,.json"
-          onChange={(e) => { if (e.currentTarget.files[0]) handleFile(e.currentTarget.files[0]); }}
+          onChange={(e) => {
+            if (e.currentTarget.files[0]) handleFile(e.currentTarget.files[0]);
+          }}
         />
       </div>
       {err && <div class="alert alert--error">{err}</div>}
       {warnings.length > 0 && (
         <div class="alert alert--warn">
-          {warnings.map((w, i) => <div key={i}>{w}</div>)}
+          {warnings.map((w, i) => (
+            <div key={i}>{w}</div>
+          ))}
         </div>
       )}
       {parsed && (
         <div class="alert alert--success">
           <div class="bold">{parsed.name}</div>
-          <div>{parsed.cards.length} cards • {parsed.tags.length} tags • {parsed.language}</div>
+          <div>
+            {parsed.cards.length} cards • {parsed.tags.length} tags • {parsed.language}
+          </div>
         </div>
       )}
       <div class="row" style={{ justifyContent: 'flex-end', marginTop: '12px' }}>
-        <button class="btn btn--ghost" onClick={onClose}>{STRINGS.parent.decks.create.cancel}</button>
-        <button class="btn" onClick={submit} disabled={!parsed || busy}>{STRINGS.parent.decks.create.submit}</button>
+        <button class="btn btn--ghost" onClick={onClose}>
+          {STRINGS.parent.decks.create.cancel}
+        </button>
+        <button class="btn" onClick={submit} disabled={!parsed || busy}>
+          {STRINGS.parent.decks.create.submit}
+        </button>
       </div>
     </Modal>
   );
@@ -230,14 +311,28 @@ function DeleteDeckModal({ deck, onClose, onDeleted }) {
   return (
     <Modal open onClose={onClose} title={STRINGS.parent.decks.delete.title}>
       <p>{STRINGS.parent.decks.delete.body}</p>
-      <p class="text-soft"><strong>{deck.name}</strong> — {deck.cards.length} cards</p>
+      <p class="text-soft">
+        <strong>{deck.name}</strong> — {deck.cards.length} cards
+      </p>
       <div class="row" style={{ justifyContent: 'flex-end', marginTop: '12px' }}>
-        <button class="btn btn--ghost" onClick={onClose}>{STRINGS.parent.decks.delete.no}</button>
-        <button class="btn btn--orange" disabled={busy} onClick={async () => {
-          setBusy(true);
-          try { await deleteDeck(deck.id); onDeleted && onDeleted(); }
-          finally { setBusy(false); }
-        }}>{STRINGS.parent.decks.delete.yes}</button>
+        <button class="btn btn--ghost" onClick={onClose}>
+          {STRINGS.parent.decks.delete.no}
+        </button>
+        <button
+          class="btn btn--orange"
+          disabled={busy}
+          onClick={async () => {
+            setBusy(true);
+            try {
+              await deleteDeck(deck.id);
+              onDeleted && onDeleted();
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          {STRINGS.parent.decks.delete.yes}
+        </button>
       </div>
     </Modal>
   );
@@ -274,30 +369,39 @@ function ReplaceCardsModal({ deck, onClose, onReplaced }) {
 
   return (
     <Modal open onClose={onClose} title={STRINGS.parent.decks.replace.title}>
-      <p class="text-soft">{deck.name} — current: {deck.cards.length} cards</p>
+      <p class="text-soft">
+        {deck.name} — current: {deck.cards.length} cards
+      </p>
       <div
         class="dropzone"
         onClick={() => inputRef.current && inputRef.current.click()}
-        onDragOver={(e) => { e.preventDefault(); }}
-        onDrop={(e) => { e.preventDefault(); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+        }}
       >
         <div class="bold">{file ? file.name : 'Drop replacement JSON here'}</div>
-        <div class="dropzone__hint">Unchanged cards keep their progress; new cards start fresh, removed cards are dropped.</div>
+        <div class="dropzone__hint">
+          Unchanged cards keep their progress; new cards start fresh, removed cards are dropped.
+        </div>
         <input
           ref={inputRef}
           type="file"
           accept="application/json,.json"
-          onChange={(e) => { if (e.currentTarget.files[0]) handleFile(e.currentTarget.files[0]); }}
+          onChange={(e) => {
+            if (e.currentTarget.files[0]) handleFile(e.currentTarget.files[0]);
+          }}
         />
       </div>
       {err && <div class="alert alert--error">{err}</div>}
-      {summary && (
-        <div class="alert alert--info">
-          {STRINGS.parent.decks.replace.body(summary)}
-        </div>
-      )}
+      {summary && <div class="alert alert--info">{STRINGS.parent.decks.replace.body(summary)}</div>}
       <div class="row" style={{ justifyContent: 'flex-end', marginTop: '12px' }}>
-        <button class="btn btn--ghost" onClick={onClose}>{STRINGS.parent.decks.replace.no}</button>
+        <button class="btn btn--ghost" onClick={onClose}>
+          {STRINGS.parent.decks.replace.no}
+        </button>
         <button
           class="btn btn--orange"
           disabled={!parsed || busy}
@@ -306,9 +410,13 @@ function ReplaceCardsModal({ deck, onClose, onReplaced }) {
             try {
               await replaceCards(deck.id, parsed.cards);
               onReplaced && onReplaced();
-            } finally { setBusy(false); }
+            } finally {
+              setBusy(false);
+            }
           }}
-        >{STRINGS.parent.decks.replace.yes}</button>
+        >
+          {STRINGS.parent.decks.replace.yes}
+        </button>
       </div>
     </Modal>
   );
@@ -320,7 +428,9 @@ function EditDeckModal({ deck, onClose, onSaved }) {
   const [tags, setTags] = useState((deck.tags || []).join(', '));
   const [voiceURI, setVoiceURI] = useState(deck.voiceURI || '');
   const [voices, setVoices] = useState([]);
-  const [sessionSize, setSessionSize] = useState(deck.sessionSize || { spelling: null, phrase: null, fact: null, audio: null });
+  const [sessionSize, setSessionSize] = useState(
+    deck.sessionSize || { spelling: null, phrase: null, fact: null, audio: null }
+  );
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -333,14 +443,19 @@ function EditDeckModal({ deck, onClose, onSaved }) {
   async function save() {
     setBusy(true);
     try {
-      const tagList = tags.split(',').map((t) => t.trim()).filter(Boolean);
+      const tagList = tags
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
       const ss = {
         spelling: sessionSize.spelling === '' ? null : Number(sessionSize.spelling),
         phrase: sessionSize.phrase === '' ? null : Number(sessionSize.phrase),
         fact: sessionSize.fact === '' ? null : Number(sessionSize.fact),
         audio: sessionSize.audio === '' ? null : Number(sessionSize.audio)
       };
-      const allNull = [ss.spelling, ss.phrase, ss.fact, ss.audio].every((v) => v === null || Number.isNaN(v));
+      const allNull = [ss.spelling, ss.phrase, ss.fact, ss.audio].every(
+        (v) => v === null || Number.isNaN(v)
+      );
       await updateDeck(deck.id, {
         name: name.trim(),
         language,
@@ -349,7 +464,9 @@ function EditDeckModal({ deck, onClose, onSaved }) {
         sessionSize: allNull ? null : ss
       });
       onSaved && onSaved();
-    } finally { setBusy(false); }
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -368,10 +485,18 @@ function EditDeckModal({ deck, onClose, onSaved }) {
       </div>
       <div class="form-row">
         <label class="label">{STRINGS.parent.decks.edit.voice}</label>
-        <select class="select" value={voiceURI} onChange={(e) => setVoiceURI(e.currentTarget.value)}>
+        <select
+          class="select"
+          value={voiceURI}
+          onChange={(e) => setVoiceURI(e.currentTarget.value)}
+        >
           <option value="">{STRINGS.parent.decks.edit.voice} (auto)</option>
           {voices.length === 0 && <option value="">{STRINGS.parent.decks.edit.noVoice}</option>}
-          {voices.map((v) => <option key={v.voiceURI} value={v.voiceURI}>{v.name} ({v.lang})</option>)}
+          {voices.map((v) => (
+            <option key={v.voiceURI} value={v.voiceURI}>
+              {v.name} ({v.lang})
+            </option>
+          ))}
         </select>
       </div>
       <div class="form-row">
@@ -379,7 +504,9 @@ function EditDeckModal({ deck, onClose, onSaved }) {
         <div class="row row--tight" style={{ flexWrap: 'wrap' }}>
           {['spelling', 'phrase', 'fact', 'audio'].map((t) => (
             <div key={t} style={{ flex: '1 1 90px' }}>
-              <label class="label" style={{ fontSize: '0.8rem' }}>{t}</label>
+              <label class="label" style={{ fontSize: '0.8rem' }}>
+                {t}
+              </label>
               <input
                 class="input"
                 type="number"
@@ -394,8 +521,12 @@ function EditDeckModal({ deck, onClose, onSaved }) {
         </div>
       </div>
       <div class="row" style={{ justifyContent: 'flex-end' }}>
-        <button class="btn btn--ghost" onClick={onClose}>{STRINGS.parent.decks.edit.cancel}</button>
-        <button class="btn" disabled={busy} onClick={save}>{STRINGS.parent.decks.edit.save}</button>
+        <button class="btn btn--ghost" onClick={onClose}>
+          {STRINGS.parent.decks.edit.cancel}
+        </button>
+        <button class="btn" disabled={busy} onClick={save}>
+          {STRINGS.parent.decks.edit.save}
+        </button>
       </div>
     </Modal>
   );

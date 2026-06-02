@@ -14,7 +14,9 @@ export function BarChart({ data, options = {}, height = 220, className = '' }) {
       data: {
         ...data,
         datasets: (data.datasets || []).map((ds, i) => ({
-          backgroundColor: (ds.data || []).map((_, j) => (ds.colors && ds.colors[j]) || palette(8)[i]),
+          backgroundColor: (ds.data || []).map(
+            (_, j) => (ds.colors && ds.colors[j]) || palette(8)[i]
+          ),
           borderRadius: 8,
           ...ds
         }))
@@ -33,7 +35,12 @@ export function BarChart({ data, options = {}, height = 220, className = '' }) {
         ...options
       }
     });
-    return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };
+    return () => {
+      if (chartRef.current) {
+        chartRef.current.destroy();
+        chartRef.current = null;
+      }
+    };
   }, [JSON.stringify(data)]);
   return (
     <div class={`metric__chart ${className}`} style={{ height: `${height}px` }}>

@@ -3,15 +3,85 @@
   "language": "en-US",
   "tags": ["science", "grade-1", "animals"],
   "cards": [
-    { "id": "sp01", "type": "spelling", "emoji": "🐱", "image": null, "prompt": "The long thin hairs on a cat's face", "answer": "whiskers" },
-    { "id": "sp02", "type": "spelling", "emoji": "🐘", "image": null, "prompt": "The long nose of an elephant", "answer": "trunk" },
-    { "id": "sp03", "type": "spelling", "emoji": "🦒", "image": null, "prompt": "An animal with a very long neck", "answer": "giraffe" },
-    { "id": "sp04", "type": "spelling", "emoji": "🐰", "image": null, "prompt": "A small hopping animal with long ears", "answer": "rabbit" },
-    { "id": "sp05", "type": "spelling", "emoji": "🐬", "image": null, "prompt": "A smart sea animal that clicks and whistles", "answer": "dolphin" },
-    { "id": "ph01", "type": "phrase", "emoji": "👁️", "image": null, "prompt": "Which sense uses your eyes?", "answer": "sight" },
-    { "id": "ph02", "type": "phrase", "emoji": "👃", "image": null, "prompt": "Which sense uses your nose?", "answer": "smell" },
-    { "id": "ph03", "type": "phrase", "emoji": "👂", "image": null, "prompt": "Which sense uses your ears?", "answer": "hearing" },
-    { "id": "fa01", "type": "fact", "emoji": "🦴", "image": null, "prompt": "How many bones does an adult human have?", "answer": "206" },
-    { "id": "fa02", "type": "fact", "emoji": "❤️", "image": null, "prompt": "Which organ pumps blood around your body?", "answer": "the heart" }
+    {
+      "id": "sp01",
+      "type": "spelling",
+      "emoji": "🐱",
+      "image": null,
+      "prompt": "The long thin hairs on a cat's face",
+      "answer": "whiskers"
+    },
+    {
+      "id": "sp02",
+      "type": "spelling",
+      "emoji": "🐘",
+      "image": null,
+      "prompt": "The long nose of an elephant",
+      "answer": "trunk"
+    },
+    {
+      "id": "sp03",
+      "type": "spelling",
+      "emoji": "🦒",
+      "image": null,
+      "prompt": "An animal with a very long neck",
+      "answer": "giraffe"
+    },
+    {
+      "id": "sp04",
+      "type": "spelling",
+      "emoji": "🐰",
+      "image": null,
+      "prompt": "A small hopping animal with long ears",
+      "answer": "rabbit"
+    },
+    {
+      "id": "sp05",
+      "type": "spelling",
+      "emoji": "🐬",
+      "image": null,
+      "prompt": "A smart sea animal that clicks and whistles",
+      "answer": "dolphin"
+    },
+    {
+      "id": "ph01",
+      "type": "phrase",
+      "emoji": "👁️",
+      "image": null,
+      "prompt": "Which sense uses your eyes?",
+      "answer": "sight"
+    },
+    {
+      "id": "ph02",
+      "type": "phrase",
+      "emoji": "👃",
+      "image": null,
+      "prompt": "Which sense uses your nose?",
+      "answer": "smell"
+    },
+    {
+      "id": "ph03",
+      "type": "phrase",
+      "emoji": "👂",
+      "image": null,
+      "prompt": "Which sense uses your ears?",
+      "answer": "hearing"
+    },
+    {
+      "id": "fa01",
+      "type": "fact",
+      "emoji": "🦴",
+      "image": null,
+      "prompt": "How many bones does an adult human have?",
+      "answer": "206"
+    },
+    {
+      "id": "fa02",
+      "type": "fact",
+      "emoji": "❤️",
+      "image": null,
+      "prompt": "Which organ pumps blood around your body?",
+      "answer": "the heart"
+    }
   ]
 }

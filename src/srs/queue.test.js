@@ -21,30 +21,50 @@ describe('buildSessionQueue', () => {
 
   it('takes new cards when nothing is due', () => {
     const cards = [card('a', 'spelling'), card('b', 'spelling'), card('c', 'phrase')];
-    const q = buildSessionQueue({ cards, srsByCardId: {}, sessionSize: { spelling: 2, phrase: 1, fact: 0, audio: 0 } });
+    const q = buildSessionQueue({
+      cards,
+      srsByCardId: {},
+      sessionSize: { spelling: 2, phrase: 1, fact: 0, audio: 0 }
+    });
     expect(q).toHaveLength(3);
     expect(new Set(q.map((c) => c.id))).toEqual(new Set(['a', 'b', 'c']));
   });
 
   it('respects per-type session caps', () => {
     const cards = [
-      card('a', 'spelling'), card('b', 'spelling'), card('c', 'spelling'),
-      card('d', 'spelling'), card('e', 'spelling')
+      card('a', 'spelling'),
+      card('b', 'spelling'),
+      card('c', 'spelling'),
+      card('d', 'spelling'),
+      card('e', 'spelling')
     ];
-    const q = buildSessionQueue({ cards, srsByCardId: {}, sessionSize: { spelling: 2, phrase: 0, fact: 0, audio: 0 } });
+    const q = buildSessionQueue({
+      cards,
+      srsByCardId: {},
+      sessionSize: { spelling: 2, phrase: 0, fact: 0, audio: 0 }
+    });
     expect(q).toHaveLength(2);
   });
 
   it('prefers due cards over new cards when caps exceed due count', () => {
     // 2 due cards + 2 new cards, cap 3. The queue should take both due
     // cards plus one new card — not the other way around.
-    const cards = [card('a', 'spelling'), card('b', 'spelling'), card('c', 'spelling'), card('d', 'spelling')];
+    const cards = [
+      card('a', 'spelling'),
+      card('b', 'spelling'),
+      card('c', 'spelling'),
+      card('d', 'spelling')
+    ];
     const srsByCardId = {
       a: { cardId: 'a', due: NOW - DAY, reps: 1, interval: 1 },
       b: { cardId: 'b', due: NOW - 2 * DAY, reps: 1, interval: 2 }
       // c and d are new
     };
-    const q = buildSessionQueue({ cards, srsByCardId, sessionSize: { spelling: 3, phrase: 0, fact: 0, audio: 0 } });
+    const q = buildSessionQueue({
+      cards,
+      srsByCardId,
+      sessionSize: { spelling: 3, phrase: 0, fact: 0, audio: 0 }
+    });
     expect(q).toHaveLength(3);
     const ids = new Set(q.map((c) => c.id));
     expect(ids.has('a')).toBe(true);
@@ -61,7 +81,11 @@ describe('buildSessionQueue', () => {
       b: { cardId: 'b', due: NOW - DAY, reps: 1, interval: 1 },
       c: { cardId: 'c', due: NOW - 2 * DAY, reps: 1, interval: 2 }
     };
-    const q = buildSessionQueue({ cards, srsByCardId, sessionSize: { spelling: 3, phrase: 0, fact: 0, audio: 0 } });
+    const q = buildSessionQueue({
+      cards,
+      srsByCardId,
+      sessionSize: { spelling: 3, phrase: 0, fact: 0, audio: 0 }
+    });
     expect(q).toHaveLength(3);
     expect(new Set(q.map((c) => c.id))).toEqual(new Set(['a', 'b', 'c']));
   });
@@ -83,12 +107,19 @@ describe('buildSessionQueue', () => {
 
   it('returns at most the sum of caps', () => {
     const cards = [
-      card('a', 'spelling'), card('b', 'spelling'),
-      card('c', 'phrase'), card('d', 'phrase'),
+      card('a', 'spelling'),
+      card('b', 'spelling'),
+      card('c', 'phrase'),
+      card('d', 'phrase'),
       card('e', 'fact'),
-      card('f', 'audio'), card('g', 'audio')
+      card('f', 'audio'),
+      card('g', 'audio')
     ];
-    const q = buildSessionQueue({ cards, srsByCardId: {}, sessionSize: { spelling: 1, phrase: 1, fact: 1, audio: 1 } });
+    const q = buildSessionQueue({
+      cards,
+      srsByCardId: {},
+      sessionSize: { spelling: 1, phrase: 1, fact: 1, audio: 1 }
+    });
     expect(q).toHaveLength(4);
   });
 });

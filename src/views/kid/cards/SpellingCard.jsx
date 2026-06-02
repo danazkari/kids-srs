@@ -60,7 +60,9 @@ export function SpellingCard({ card, layout, onResult, registerKeys }) {
               </div>
             ))}
           </div>
-          <div class="text-soft" style={{ fontSize: '0.9rem' }}>{STRINGS.kid.session.typeHere}</div>
+          <div class="text-soft" style={{ fontSize: '0.9rem' }}>
+            {STRINGS.kid.session.typeHere}
+          </div>
         </>
       ) : (
         <>
@@ -82,9 +84,13 @@ export function SpellingCard({ card, layout, onResult, registerKeys }) {
           )}
           <div class="spelling-actions">
             {result === 'wrong' && (
-              <button class="btn btn--accent btn--lg" onClick={tryAgain}>{STRINGS.kid.session.tryAgain}</button>
+              <button class="btn btn--accent btn--lg" onClick={tryAgain}>
+                {STRINGS.kid.session.tryAgain}
+              </button>
             )}
-            <button class="btn btn--secondary btn--lg" onClick={next}>{STRINGS.kid.session.next}</button>
+            <button class="btn btn--secondary btn--lg" onClick={next}>
+              {STRINGS.kid.session.next}
+            </button>
           </div>
         </>
       )}

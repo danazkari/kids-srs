@@ -23,7 +23,9 @@ export function Modal({ open, onClose, title, children, dismissOnBackdrop = true
         {title && (
           <div class="modal__header">
             <h2>{title}</h2>
-            <button class="modal__close" onClick={onClose} aria-label="Close">✕</button>
+            <button class="modal__close" onClick={onClose} aria-label="Close">
+              ✕
+            </button>
           </div>
         )}
         {children}

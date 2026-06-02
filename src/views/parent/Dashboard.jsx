@@ -24,7 +24,9 @@ function rangeStart(range) {
   return startOfDay(Date.now()) - (range.days - 1) * DAY_MS;
 }
 
-function isoDay(ts) { return todayIso(new Date(ts)); }
+function isoDay(ts) {
+  return todayIso(new Date(ts));
+}
 
 function buildDateSeries(range) {
   if (!range.days) {
@@ -47,7 +49,12 @@ export function Dashboard() {
 
   useEffect(() => {
     (async () => {
-      const [s, d, sr, b] = await Promise.all([listSessions(), listDecks(), getAllSrs(), listBadges()]);
+      const [s, d, sr, b] = await Promise.all([
+        listSessions(),
+        listDecks(),
+        getAllSrs(),
+        listBadges()
+      ]);
       setSessions(s.filter((x) => x.completedAt && !x.abandoned));
       setDecks(d);
       setSrsList(sr);
@@ -64,22 +71,28 @@ export function Dashboard() {
 
   // Summary
   const totalCards = filtered.reduce((a, s) => a + (s.cardsReviewed || 0), 0);
-  const totalCorrect = filtered.reduce((a, s) => a + (s.cardsCorrect || 0) + (s.selfGrades?.knew || 0), 0);
+  const totalCorrect = filtered.reduce(
+    (a, s) => a + (s.cardsCorrect || 0) + (s.selfGrades?.knew || 0),
+    0
+  );
   const accuracy = totalCards ? Math.round((totalCorrect / totalCards) * 100) : 0;
   const totalSessions = filtered.length;
   const streak = useMemo(() => calcStreak(sessions), [sessions]);
 
   // Read theme colors at mount. When the user changes theme in Settings the
   // Dashboard tab unmounts, so the next time it's opened we re-read.
-  const colors = useMemo(() => ({
-    primary: cssVar('--primary'),
-    secondary: cssVar('--secondary'),
-    accent: cssVar('--accent'),
-    green: cssVar('--green'),
-    orange: cssVar('--orange'),
-    purple: cssVar('--purple'),
-    text: cssVar('--text-soft')
-  }), []);
+  const colors = useMemo(
+    () => ({
+      primary: cssVar('--primary'),
+      secondary: cssVar('--secondary'),
+      accent: cssVar('--accent'),
+      green: cssVar('--green'),
+      orange: cssVar('--orange'),
+      purple: cssVar('--purple'),
+      text: cssVar('--text-soft')
+    }),
+    []
+  );
 
   // Daily cards line chart
   const dates = useMemo(() => buildDateSeries(range), [range]);
@@ -100,7 +113,7 @@ export function Dashboard() {
     const map = new Map();
     for (const s of filtered) {
       const k = s.date;
-      const mins = Math.round((s.durationSeconds || 0) / 60 * 10) / 10;
+      const mins = Math.round(((s.durationSeconds || 0) / 60) * 10) / 10;
       map.set(k, (map.get(k) || 0) + mins);
     }
     return map;
@@ -113,7 +126,10 @@ export function Dashboard() {
     const corMap = new Map();
     for (const s of filtered) {
       totMap.set(s.date, (totMap.get(s.date) || 0) + (s.cardsReviewed || 0));
-      corMap.set(s.date, (corMap.get(s.date) || 0) + (s.cardsCorrect || 0) + (s.selfGrades?.knew || 0));
+      corMap.set(
+        s.date,
+        (corMap.get(s.date) || 0) + (s.cardsCorrect || 0) + (s.selfGrades?.knew || 0)
+      );
     }
     return dailyLabels.map((d) => {
       const t = totMap.get(d) || 0;
@@ -175,7 +191,9 @@ export function Dashboard() {
               onClick={() => setRangeId(r.id)}
               role="tab"
               aria-selected={rangeId === r.id}
-            >{r.label}</button>
+            >
+              {r.label}
+            </button>
           ))}
         </div>
       </div>
@@ -231,14 +249,24 @@ export function Dashboard() {
           <div class="metric">
             <h3>🎯 {STRINGS.parent.overview.charts.accuracy}</h3>
             {accuracyByDate.every((v) => v === null) ? (
-              <div class="text-soft" style={{ padding: '12px' }}>{STRINGS.parent.overview.charts.noAccuracy}</div>
+              <div class="text-soft" style={{ padding: '12px' }}>
+                {STRINGS.parent.overview.charts.noAccuracy}
+              </div>
             ) : (
               <LineChart
                 data={{
                   labels: dailyLabels,
-                  datasets: [{ label: 'Accuracy %', data: accuracyByDate.map((v) => v ?? 0), color: colors.green }]
+                  datasets: [
+                    {
+                      label: 'Accuracy %',
+                      data: accuracyByDate.map((v) => v ?? 0),
+                      color: colors.green
+                    }
+                  ]
                 }}
-                options={{ scales: { y: { suggestedMax: 100, ticks: { callback: (v) => v + '%' } } } }}
+                options={{
+                  scales: { y: { suggestedMax: 100, ticks: { callback: (v) => v + '%' } } }
+                }}
               />
             )}
           </div>
@@ -247,18 +275,27 @@ export function Dashboard() {
             <h3>🍩 {STRINGS.parent.overview.charts.mastery}</h3>
             <DoughnutChart
               data={{
-                labels: [STRINGS.parent.overview.mastery.new, STRINGS.parent.overview.mastery.learning, STRINGS.parent.overview.mastery.mastered, STRINGS.parent.overview.mastery.overdue],
-                datasets: [{
-                  data: [mastery.new, mastery.learning, mastery.mastered, mastery.overdue],
-                  backgroundColor: [colors.primary, colors.accent, colors.green, colors.orange]
-                }]
+                labels: [
+                  STRINGS.parent.overview.mastery.new,
+                  STRINGS.parent.overview.mastery.learning,
+                  STRINGS.parent.overview.mastery.mastered,
+                  STRINGS.parent.overview.mastery.overdue
+                ],
+                datasets: [
+                  {
+                    data: [mastery.new, mastery.learning, mastery.mastered, mastery.overdue],
+                    backgroundColor: [colors.primary, colors.accent, colors.green, colors.orange]
+                  }
+                ]
               }}
             />
           </div>
 
           <div class="metric" style={{ gridColumn: '1 / -1' }}>
             <h3>📅 {STRINGS.parent.overview.charts.streak}</h3>
-            <p class="text-soft" style={{ fontSize: '0.9rem' }}>{STRINGS.parent.overview.charts.streakSub}</p>
+            <p class="text-soft" style={{ fontSize: '0.9rem' }}>
+              {STRINGS.parent.overview.charts.streakSub}
+            </p>
             <div class="metric__chart--heatmap">
               <Heatmap sessions={sessions} days={84} />
             </div>
@@ -267,7 +304,9 @@ export function Dashboard() {
           <div class="metric" style={{ gridColumn: '1 / -1' }}>
             <h3>💪 {STRINGS.parent.overview.charts.hardest}</h3>
             {hardest.length === 0 ? (
-              <div class="text-soft" style={{ padding: '12px' }}>No missed cards yet — great!</div>
+              <div class="text-soft" style={{ padding: '12px' }}>
+                No missed cards yet — great!
+              </div>
             ) : (
               <div class="table-wrap">
                 <table class="table">
@@ -297,16 +336,29 @@ export function Dashboard() {
           <div class="metric" style={{ gridColumn: '1 / -1' }}>
             <h3>🏅 {STRINGS.parent.overview.charts.badges}</h3>
             {earnedBadges.length === 0 ? (
-              <div class="text-soft" style={{ padding: '12px' }}>No badges earned yet.</div>
+              <div class="text-soft" style={{ padding: '12px' }}>
+                No badges earned yet.
+              </div>
             ) : (
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {earnedBadges.map((b) => (
-                  <li key={b.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+                  <li
+                    key={b.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '8px 0',
+                      borderBottom: '1px solid var(--border)'
+                    }}
+                  >
                     <span style={{ fontSize: '1.6rem' }}>{b.emoji}</span>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 700 }}>{b.name}</div>
                     </div>
-                    <div class="text-soft" style={{ fontSize: '0.85rem' }}>{new Date(b.earnedAt).toLocaleDateString()}</div>
+                    <div class="text-soft" style={{ fontSize: '0.85rem' }}>
+                      {new Date(b.earnedAt).toLocaleDateString()}
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -319,10 +371,19 @@ export function Dashboard() {
 }
 
 export function computeMastery(srsList, now = Date.now()) {
-  let n = 0, l = 0, m = 0, o = 0;
+  let n = 0,
+    l = 0,
+    m = 0,
+    o = 0;
   for (const s of srsList) {
-    if (!s.lastReviewed && !s.reps) { n++; continue; }
-    if (s.due < now - DAY_MS) { o++; continue; }
+    if (!s.lastReviewed && !s.reps) {
+      n++;
+      continue;
+    }
+    if (s.due < now - DAY_MS) {
+      o++;
+      continue;
+    }
     if (s.interval >= 7) m++;
     else l++;
   }

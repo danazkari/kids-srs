@@ -45,7 +45,9 @@ function App() {
     })();
     // Pre-warm voices.
     getVoices().catch(() => {});
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Apply theme + accent whenever the profile changes (covers boot and
@@ -66,7 +68,13 @@ function App() {
   const path = route.path || '/';
   return (
     <div class="app-shell">
-      <RouteSwitch path={path} params={route.params} profile={profile} setProfile={setProfile} navigate={navigate} />
+      <RouteSwitch
+        path={path}
+        params={route.params}
+        profile={profile}
+        setProfile={setProfile}
+        navigate={navigate}
+      />
       <ToastHost />
     </div>
   );
@@ -80,10 +88,19 @@ function RouteSwitch({ path, params, profile, setProfile, navigate }) {
     return <Home profile={profile} navigate={navigate} />;
   }
   if (p === '/session') {
-    return <Session deckId={params.deck} profile={profile} setProfile={setProfile} navigate={navigate} />;
+    return (
+      <Session deckId={params.deck} profile={profile} setProfile={setProfile} navigate={navigate} />
+    );
   }
   if (p === '/parent' || p.startsWith('/parent/')) {
-    return <ParentRoute tab={params.tab || 'overview'} profile={profile} setProfile={setProfile} navigate={navigate} />;
+    return (
+      <ParentRoute
+        tab={params.tab || 'overview'}
+        profile={profile}
+        setProfile={setProfile}
+        navigate={navigate}
+      />
+    );
   }
   // Fallback: kid home
   return <Home profile={profile} navigate={navigate} />;
@@ -92,12 +109,21 @@ function RouteSwitch({ path, params, profile, setProfile, navigate }) {
 function ParentRoute({ tab, profile, setProfile, navigate }) {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem('parent-authed') === '1');
   if (!authed) {
-    return <Gate onSuccess={() => { sessionStorage.setItem('parent-authed', '1'); setAuthed(true); }} onCancel={() => navigate('/')} />;
+    return (
+      <Gate
+        onSuccess={() => {
+          sessionStorage.setItem('parent-authed', '1');
+          setAuthed(true);
+        }}
+        onCancel={() => navigate('/')}
+      />
+    );
   }
   const activeTab = tab || 'overview';
   let content;
   if (activeTab === 'decks') content = <Decks />;
-  else if (activeTab === 'settings') content = <Settings profile={profile} setProfile={setProfile} />;
+  else if (activeTab === 'settings')
+    content = <Settings profile={profile} setProfile={setProfile} />;
   else content = <Dashboard />;
 
   return (
@@ -109,20 +135,38 @@ function ParentRoute({ tab, profile, setProfile, navigate }) {
         </div>
         <button
           class="btn btn--ghost btn--small"
-          onClick={() => { sessionStorage.removeItem('parent-authed'); navigate('/'); }}
+          onClick={() => {
+            sessionStorage.removeItem('parent-authed');
+            navigate('/');
+          }}
         >
           {STRINGS.parent.nav.exit}
         </button>
       </header>
       <nav class="parent-nav" aria-label="parent sections">
-        <button class={`parent-nav__btn ${activeTab === 'overview' ? 'is-active' : ''}`} onClick={() => navigate('/parent/overview')}>{STRINGS.parent.nav.overview}</button>
-        <button class={`parent-nav__btn ${activeTab === 'decks' ? 'is-active' : ''}`} onClick={() => navigate('/parent/decks')}>{STRINGS.parent.nav.decks}</button>
-        <button class={`parent-nav__btn ${activeTab === 'settings' ? 'is-active' : ''}`} onClick={() => navigate('/parent/settings')}>{STRINGS.parent.nav.settings}</button>
-        <button class="parent-nav__btn" onClick={() => navigate('/')}>← {STRINGS.parent.nav.home}</button>
+        <button
+          class={`parent-nav__btn ${activeTab === 'overview' ? 'is-active' : ''}`}
+          onClick={() => navigate('/parent/overview')}
+        >
+          {STRINGS.parent.nav.overview}
+        </button>
+        <button
+          class={`parent-nav__btn ${activeTab === 'decks' ? 'is-active' : ''}`}
+          onClick={() => navigate('/parent/decks')}
+        >
+          {STRINGS.parent.nav.decks}
+        </button>
+        <button
+          class={`parent-nav__btn ${activeTab === 'settings' ? 'is-active' : ''}`}
+          onClick={() => navigate('/parent/settings')}
+        >
+          {STRINGS.parent.nav.settings}
+        </button>
+        <button class="parent-nav__btn" onClick={() => navigate('/')}>
+          ← {STRINGS.parent.nav.home}
+        </button>
       </nav>
-      <main class="parent-main">
-        {content}
-      </main>
+      <main class="parent-main">{content}</main>
     </div>
   );
 }
@@ -142,7 +186,11 @@ function BootError({ message, detail }) {
       <div class="card-surface" style={{ maxWidth: '480px', textAlign: 'center' }}>
         <div style={{ fontSize: '4rem' }}>😢</div>
         <h2 style={{ margin: '12px 0' }}>{message}</h2>
-        {detail && <p class="text-soft" style={{ fontSize: '0.9rem' }}>{detail}</p>}
+        {detail && (
+          <p class="text-soft" style={{ fontSize: '0.9rem' }}>
+            {detail}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -151,10 +199,12 @@ function BootError({ message, detail }) {
 // Register service worker (only in production)
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
-    import('workbox-window').then(({ Workbox }) => {
-      const wb = new Workbox('/sw.js');
-      wb.register().catch(() => {});
-    }).catch(() => {});
+    import('workbox-window')
+      .then(({ Workbox }) => {
+        const wb = new Workbox('/sw.js');
+        wb.register().catch(() => {});
+      })
+      .catch(() => {});
   });
 }
 

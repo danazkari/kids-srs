@@ -42,7 +42,7 @@ export const STRINGS = {
       spellingTryAgain: 'Try once more!',
       keepGoing: 'Keep going!',
       perfect: 'Perfect round! ✨',
-      resumed: 'Welcome back! Let\'s keep going.'
+      resumed: "Welcome back! Let's keep going."
     },
     badges: {
       title: 'My Badges',
@@ -90,7 +90,8 @@ export const STRINGS = {
         streakSub: 'Each square is a day. Darker = more sessions.',
         hardest: 'Hardest cards',
         badges: 'Badges earned',
-        noAccuracy: 'No accuracy data yet — once your kid does some sessions, the chart will appear.'
+        noAccuracy:
+          'No accuracy data yet — once your kid does some sessions, the chart will appear.'
       },
       mastery: { new: 'New', learning: 'Learning', mastered: 'Mastered', overdue: 'Overdue' },
       table: { deck: 'Deck', prompt: 'Prompt', lapses: 'Lapses', interval: 'Interval (days)' },
@@ -101,7 +102,14 @@ export const STRINGS = {
       addButton: 'Add deck',
       empty: 'No decks yet. Add a JSON file to get started.',
       filters: { all: 'All', active: 'Active', archived: 'Archived' },
-      actions: { edit: 'Edit', download: 'Download', archive: 'Archive', unarchive: 'Unarchive', delete: 'Delete', replace: 'Replace cards' },
+      actions: {
+        edit: 'Edit',
+        download: 'Download',
+        archive: 'Archive',
+        unarchive: 'Unarchive',
+        delete: 'Delete',
+        replace: 'Replace cards'
+      },
       create: {
         title: 'Add a new deck',
         drop: 'Drop a deck JSON file here, or click to choose',
@@ -109,11 +117,12 @@ export const STRINGS = {
         submit: 'Upload deck',
         cancel: 'Cancel',
         errors: {
-          invalidJson: 'That file isn\'t valid JSON.',
+          invalidJson: "That file isn't valid JSON.",
           missingName: 'The deck needs a name.',
           missingCards: 'The deck needs at least one card.',
           badCard: (i, msg) => `Card #${i + 1}: ${msg}`,
-          largeImage: (size) => `Image is large (${Math.round(size / 1024)} KB). Consider using a URL.`,
+          largeImage: (size) =>
+            `Image is large (${Math.round(size / 1024)} KB). Consider using a URL.`,
           duplicate: 'A deck with this name already exists.'
         }
       },
@@ -125,7 +134,8 @@ export const STRINGS = {
       },
       replace: {
         title: 'Replace cards?',
-        body: (summary) => `${summary.added} new, ${summary.removed} removed, ${summary.unchanged} unchanged. Unchanged cards keep their progress; new cards start fresh.`,
+        body: (summary) =>
+          `${summary.added} new, ${summary.removed} removed, ${summary.unchanged} unchanged. Unchanged cards keep their progress; new cards start fresh.`,
         yes: 'Replace',
         no: 'Cancel'
       },
@@ -143,7 +153,7 @@ export const STRINGS = {
     },
     settings: {
       title: 'Settings',
-      profile: { title: 'Profile', name: 'Kid\'s name' },
+      profile: { title: 'Profile', name: "Kid's name" },
       keyboard: { title: 'Keyboard layout', qwerty: 'QWERTY', abc: 'ABC (alphabetical)' },
       session: {
         title: 'Session size (global defaults)',

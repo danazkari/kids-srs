@@ -21,10 +21,19 @@ let _registered = false;
 export function ensureChartRegistered() {
   if (_registered) return;
   Chart.register(
-    LineController, BarController, DoughnutController,
-    LineElement, PointElement, BarElement, ArcElement,
-    CategoryScale, LinearScale, TimeScale,
-    Tooltip, Legend, Filler
+    LineController,
+    BarController,
+    DoughnutController,
+    LineElement,
+    PointElement,
+    BarElement,
+    ArcElement,
+    CategoryScale,
+    LinearScale,
+    TimeScale,
+    Tooltip,
+    Legend,
+    Filler
   );
   Chart.defaults.font.family = cssVar('--font-base') || 'Comic Relief, system-ui, sans-serif';
   Chart.defaults.color = cssVar('--text') || '#3a2d4f';

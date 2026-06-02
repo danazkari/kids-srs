@@ -1,6 +1,6 @@
 # SPEC
 
-What SRS Kids is and what it is not, in one page. The README explains *how* to run it; this file explains *what* you're building.
+What SRS Kids is and what it is not, in one page. The README explains _how_ to run it; this file explains _what_ you're building.
 
 ## Scope
 
@@ -14,12 +14,12 @@ What SRS Kids is and what it is not, in one page. The README explains *how* to r
 
 A deck is an array of cards. Each card has a `type`:
 
-| Type | Grading | Notes |
-|---|---|---|
-| `spelling` | Auto-graded. Correct → grade 2, wrong → grade 0. | Uses the on-screen A–Z keyboard. Case- and diacritic-insensitive. |
-| `phrase`   | Self-graded. Three buttons: not yet (0), almost (1), knew it (2). | Standard flip card. |
-| `fact`     | Same as `phrase`. | Kept as a separate type so the queue builder can order them differently in the future. |
-| `audio`    | Self-graded, same three buttons. | TTS via Web Speech API on flip. |
+| Type       | Grading                                                           | Notes                                                                                  |
+| ---------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `spelling` | Auto-graded. Correct → grade 2, wrong → grade 0.                  | Uses the on-screen A–Z keyboard. Case- and diacritic-insensitive.                      |
+| `phrase`   | Self-graded. Three buttons: not yet (0), almost (1), knew it (2). | Standard flip card.                                                                    |
+| `fact`     | Same as `phrase`.                                                 | Kept as a separate type so the queue builder can order them differently in the future. |
+| `audio`    | Self-graded, same three buttons.                                  | TTS via Web Speech API on flip.                                                        |
 
 ## SRS algorithm
 

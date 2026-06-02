@@ -29,7 +29,15 @@ describe('newSrsState', () => {
 
 describe('applyGrade', () => {
   it('FAIL resets reps, sets interval to 1 day, drops ease, increments lapses', () => {
-    const s = { cardId: 'c', deckId: 'd', interval: 10, easeFactor: 2.5, reps: 5, lapses: 0, lastReviewed: 0 };
+    const s = {
+      cardId: 'c',
+      deckId: 'd',
+      interval: 10,
+      easeFactor: 2.5,
+      reps: 5,
+      lapses: 0,
+      lastReviewed: 0
+    };
     const next = applyGrade(s, GRADE.FAIL, NOW);
     expect(next.reps).toBe(0);
     expect(next.interval).toBe(1);
@@ -40,13 +48,29 @@ describe('applyGrade', () => {
   });
 
   it('FAIL respects the MIN_EASE floor', () => {
-    const s = { cardId: 'c', deckId: 'd', interval: 1, easeFactor: MIN_EASE, reps: 0, lapses: 0, lastReviewed: 0 };
+    const s = {
+      cardId: 'c',
+      deckId: 'd',
+      interval: 1,
+      easeFactor: MIN_EASE,
+      reps: 0,
+      lapses: 0,
+      lastReviewed: 0
+    };
     const next = applyGrade(s, GRADE.FAIL, NOW);
     expect(next.easeFactor).toBe(MIN_EASE);
   });
 
   it('ALMOST grows interval by 1.2x and drops ease slightly', () => {
-    const s = { cardId: 'c', deckId: 'd', interval: 10, easeFactor: 2.5, reps: 1, lapses: 0, lastReviewed: 0 };
+    const s = {
+      cardId: 'c',
+      deckId: 'd',
+      interval: 10,
+      easeFactor: 2.5,
+      reps: 1,
+      lapses: 0,
+      lastReviewed: 0
+    };
     const next = applyGrade(s, GRADE.ALMOST, NOW);
     expect(next.interval).toBe(12);
     expect(next.easeFactor).toBeCloseTo(2.45);
@@ -55,13 +79,29 @@ describe('applyGrade', () => {
   });
 
   it('ALMOST floors interval at 1 day for tiny intervals', () => {
-    const s = { cardId: 'c', deckId: 'd', interval: 0, easeFactor: 2.5, reps: 0, lapses: 0, lastReviewed: 0 };
+    const s = {
+      cardId: 'c',
+      deckId: 'd',
+      interval: 0,
+      easeFactor: 2.5,
+      reps: 0,
+      lapses: 0,
+      lastReviewed: 0
+    };
     const next = applyGrade(s, GRADE.ALMOST, NOW);
     expect(next.interval).toBe(1);
   });
 
   it('PASS first rep sets interval to 1 day', () => {
-    const s = { cardId: 'c', deckId: 'd', interval: 0, easeFactor: 2.5, reps: 0, lapses: 0, lastReviewed: 0 };
+    const s = {
+      cardId: 'c',
+      deckId: 'd',
+      interval: 0,
+      easeFactor: 2.5,
+      reps: 0,
+      lapses: 0,
+      lastReviewed: 0
+    };
     const next = applyGrade(s, GRADE.PASS, NOW);
     expect(next.reps).toBe(1);
     expect(next.interval).toBe(1);
@@ -69,7 +109,15 @@ describe('applyGrade', () => {
   });
 
   it('PASS second rep sets interval to 3 days', () => {
-    const s = { cardId: 'c', deckId: 'd', interval: 1, easeFactor: 2.5, reps: 1, lapses: 0, lastReviewed: 0 };
+    const s = {
+      cardId: 'c',
+      deckId: 'd',
+      interval: 1,
+      easeFactor: 2.5,
+      reps: 1,
+      lapses: 0,
+      lastReviewed: 0
+    };
     const next = applyGrade(s, GRADE.PASS, NOW);
     expect(next.reps).toBe(2);
     expect(next.interval).toBe(3);
@@ -77,7 +125,15 @@ describe('applyGrade', () => {
   });
 
   it('PASS third+ rep multiplies interval by ease (rounded)', () => {
-    const s = { cardId: 'c', deckId: 'd', interval: 3, easeFactor: 2.5, reps: 2, lapses: 0, lastReviewed: 0 };
+    const s = {
+      cardId: 'c',
+      deckId: 'd',
+      interval: 3,
+      easeFactor: 2.5,
+      reps: 2,
+      lapses: 0,
+      lastReviewed: 0
+    };
     const next = applyGrade(s, GRADE.PASS, NOW);
     expect(next.reps).toBe(3);
     expect(next.interval).toBe(8);
@@ -85,7 +141,15 @@ describe('applyGrade', () => {
   });
 
   it('does not mutate input', () => {
-    const s = { cardId: 'c', deckId: 'd', interval: 1, easeFactor: 2.5, reps: 1, lapses: 0, lastReviewed: 0 };
+    const s = {
+      cardId: 'c',
+      deckId: 'd',
+      interval: 1,
+      easeFactor: 2.5,
+      reps: 1,
+      lapses: 0,
+      lastReviewed: 0
+    };
     const before = { ...s };
     applyGrade(s, GRADE.PASS, NOW);
     expect(s).toEqual(before);

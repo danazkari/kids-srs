@@ -8,8 +8,8 @@ export const DEFAULT_SETTINGS = {
   sessionSize: { spelling: 4, phrase: 3, fact: 2, audio: 3 },
   audioAutoPlay: true,
   audioReplayButton: true,
-  theme: 'light',    // 'light' | 'dark' | 'system'
-  accent: 'pink'     // 'pink' | 'purple' | 'green' | 'blue' | 'orange'
+  theme: 'light', // 'light' | 'dark' | 'system'
+  accent: 'pink' // 'pink' | 'purple' | 'green' | 'blue' | 'orange'
 };
 
 export async function getCurrentProfile() {
