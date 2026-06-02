@@ -19,7 +19,7 @@ export function evaluateStreak({ completedDates }, target) {
   const today = startOfDay(Date.now());
   // Allow streak to count if the most recent session was today or yesterday.
   let cursor = set.has(isoDay(today)) ? today : today - DAY_MS;
-  if (!set.has(isoDay(cursor))) return 0;
+  if (!set.has(isoDay(cursor))) return false;
   while (set.has(isoDay(cursor))) {
     streak++;
     cursor -= DAY_MS;
