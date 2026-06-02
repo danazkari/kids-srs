@@ -1,0 +1,9 @@
+{
+  "name": "Audio only",
+  "language": "en-US",
+  "tags": ["e2e", "audio"],
+  "cards": [
+    { "id": "au-1", "type": "audio", "prompt": "Greeting 1", "answer": "hello" },
+    { "id": "au-2", "type": "audio", "prompt": "Greeting 2", "answer": "goodbye" }
+  ]
+}

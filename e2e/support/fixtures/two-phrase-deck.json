@@ -1,0 +1,9 @@
+{
+  "name": "Two phrase cards",
+  "language": "en-US",
+  "tags": ["e2e", "resume"],
+  "cards": [
+    { "id": "r-1", "type": "phrase", "prompt": "First", "answer": "alpha" },
+    { "id": "r-2", "type": "phrase", "prompt": "Second", "answer": "beta" }
+  ]
+}

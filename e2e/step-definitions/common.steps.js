@@ -38,7 +38,12 @@ When('I click {string}', async function (label) {
 });
 
 When('I click the {string} deck', async function (name) {
-  await this.page.getByText(name, { exact: false }).first().click();
+  // Find the deck card on the kid home by its name, then click the
+  // "Start" CTA button. Clicking the name text does nothing — only
+  // the CTA navigates to the session.
+  const card = this.page.locator('.deck-card', { hasText: name });
+  await card.locator('button.deck-card__cta').first().click();
+  await this.page.locator('.kid-session').first().waitFor({ state: 'visible', timeout: 10_000 });
 });
 
 When('I type {string} into the {string} field', async function (value, fieldLabel) {

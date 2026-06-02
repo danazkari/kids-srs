@@ -1,0 +1,8 @@
+{
+  "name": "Spelling only",
+  "language": "en-US",
+  "tags": ["e2e", "spelling"],
+  "cards": [
+    { "id": "s-1", "type": "spelling", "prompt": "Animal", "answer": "cat" }
+  ]
+}
