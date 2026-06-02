@@ -1,0 +1,25 @@
+{
+  "name": "kids-srs",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Spaced repetition study app for young children (ages 5-8). Fully offline PWA.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --host",
+    "gen-icons": "node scripts/gen-icons.mjs"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.4",
+    "chartjs-chart-matrix": "^2.0.1",
+    "idb": "^8.0.0",
+    "preact": "^10.24.1"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.9.1",
+    "vite": "^5.4.8",
+    "vite-plugin-pwa": "^0.20.5",
+    "workbox-window": "^7.1.0"
+  }
+}

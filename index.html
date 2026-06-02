@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#ff85c1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="SRS Kids" />
+    <link rel="icon" type="image/svg+xml" href="/icons/icon-192.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+    <script>
+      // Pre-paint: read last-known theme + accent from localStorage and apply
+      // before CSS loads, so returning users don't see a flash of light theme.
+      // Also syncs the browser chrome (address bar) color to the accent.
+      (function () {
+        try {
+          var ACCENT_COLORS = {
+            pink: '#ff85c1',
+            purple: '#b388ff',
+            green: '#6dd97b',
+            blue: '#85d4ff',
+            orange: '#ff8c42'
+          };
+          var raw = localStorage.getItem('srs-kids-theme');
+          var pref = raw ? JSON.parse(raw) : null;
+          var theme = (pref && pref.theme) || 'light';
+          var accent = (pref && pref.accent) || 'pink';
+          if (theme === 'system') {
+            theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark' : 'light';
+          }
+          document.documentElement.setAttribute('data-theme', theme);
+          document.documentElement.setAttribute('data-accent', accent);
+          document.documentElement.style.colorScheme = theme;
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', ACCENT_COLORS[accent] || '#ff85c1');
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&display=swap"
+    />
+    <title>SRS Kids</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "French Basics",
+  "language": "fr-FR",
+  "tags": ["french", "grade-1"],
+  "cards": [
+    { "id": "fr-au-01", "type": "audio", "emoji": "🍎", "image": null, "prompt": "apple", "answer": "une pomme" },
+    { "id": "fr-au-02", "type": "audio", "emoji": "🐱", "image": null, "prompt": "cat", "answer": "un chat" },
+    { "id": "fr-au-03", "type": "audio", "emoji": "🐶", "image": null, "prompt": "dog", "answer": "un chien" },
+    { "id": "fr-au-04", "type": "audio", "emoji": "🥖", "image": null, "prompt": "bread", "answer": "du pain" },
+    { "id": "fr-au-05", "type": "audio", "emoji": "💧", "image": null, "prompt": "water", "answer": "de l'eau" },
+    { "id": "fr-au-06", "type": "audio", "emoji": "☀️", "image": null, "prompt": "sun", "answer": "le soleil" },
+    { "id": "fr-au-07", "type": "audio", "emoji": "🌙", "image": null, "prompt": "moon", "answer": "la lune" },
+    { "id": "fr-au-08", "type": "audio", "emoji": "⭐", "image": null, "prompt": "star", "answer": "une étoile" },
+    { "id": "fr-au-09", "type": "audio", "emoji": "📕", "image": null, "prompt": "book", "answer": "un livre" },
+    { "id": "fr-au-10", "type": "audio", "emoji": "🏠", "image": null, "prompt": "house", "answer": "une maison" },
+    { "id": "fr-sp-01", "type": "spelling", "emoji": "🍎", "image": null, "prompt": "apple in French", "answer": "pomme" },
+    { "id": "fr-sp-02", "type": "spelling", "emoji": "🐱", "image": null, "prompt": "cat in French", "answer": "chat" }
+  ]
+}

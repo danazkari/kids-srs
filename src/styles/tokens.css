@@ -1,0 +1,165 @@
+/* =============================================================
+   Design tokens
+   - Accent palettes are layered: :root is the default (light + pink).
+     [data-accent="…"] overrides --primary* in light mode.
+     [data-theme="dark"] overrides the neutrals + primary* for dark.
+     [data-theme="dark"][data-accent="…"] overrides primary* for that
+     accent in dark mode (higher specificity wins).
+   ============================================================= */
+
+:root {
+  /* Light theme + pink accent (default) */
+  --bg: #fdf6ff;
+  --surface: #ffffff;
+  --primary: #ff85c1;
+  --primary-light: #ffd6ec;
+  --primary-dark: #e96aa7;
+  --secondary: #85d4ff;
+  --secondary-light: #d6f0ff;
+  --accent: #ffc85a;
+  --accent-light: #fff3d0;
+  --green: #6dd97b;
+  --green-light: #d8f8dc;
+  --orange: #ff8c42;
+  --orange-light: #ffe0cc;
+  --purple: #b388ff;
+  --purple-light: #ebe0ff;
+  --text: #3a2d4f;
+  --text-soft: #7a6a95;
+  --text-faint: #b0a4c2;
+  --border: #efe6f5;
+  --border-strong: #d8c9e8;
+
+  --radius-sm: 12px;
+  --radius: 24px;
+  --radius-lg: 32px;
+  --radius-xl: 48px;
+
+  --shadow-sm: 0 2px 8px rgba(100, 60, 160, 0.08);
+  --shadow: 0 8px 32px rgba(100, 60, 160, 0.10);
+  --shadow-lg: 0 16px 48px rgba(100, 60, 160, 0.16);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  --font-base: 'Comic Relief', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --tap-min: 48px;
+
+  --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  --gradient-warm: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  --gradient-cool: linear-gradient(135deg, var(--secondary) 0%, var(--purple) 100%);
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  /* Heatmap levels — use color-mix so they follow the accent in both themes */
+  --heatmap-0: var(--border);
+  --heatmap-1: color-mix(in srgb, var(--primary) 22%, transparent);
+  --heatmap-2: color-mix(in srgb, var(--primary) 45%, transparent);
+  --heatmap-3: color-mix(in srgb, var(--primary) 75%, transparent);
+  --heatmap-4: var(--primary);
+}
+
+/* =============================================================
+   Dark theme — keeps the same accent; flips neutrals + shadows
+   ============================================================= */
+[data-theme="dark"] {
+  --bg: #1a1226;
+  --surface: #261b3a;
+  --primary-light: #3a2547;   /* dark tint for backgrounds */
+  --primary-dark: #ffa3d0;    /* lighter for hover */
+  --secondary-light: #1f3a52;
+  --accent-light: #3d3520;
+  --green-light: #1f3a25;
+  --orange-light: #3d2818;
+  --purple-light: #2e1f4a;
+  --text: #f0e8fa;
+  --text-soft: #b0a4c2;
+  --text-faint: #6a5a85;
+  --border: #3a2d4f;
+  --border-strong: #4a3d5f;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.65);
+}
+
+/* =============================================================
+   Accent palettes (light theme) — only changes the primary
+   ============================================================= */
+[data-accent="purple"] {
+  --primary: #b388ff;
+  --primary-light: #ebe0ff;
+  --primary-dark: #9166e0;
+}
+[data-accent="green"] {
+  --primary: #6dd97b;
+  --primary-light: #d8f8dc;
+  --primary-dark: #4fbf5f;
+}
+[data-accent="blue"] {
+  --primary: #85d4ff;
+  --primary-light: #d6f0ff;
+  --primary-dark: #5cb8e8;
+}
+[data-accent="orange"] {
+  --primary: #ff8c42;
+  --primary-light: #ffe0cc;
+  --primary-dark: #e07028;
+}
+
+/* =============================================================
+   Accent palettes in dark mode — different tints needed
+   ============================================================= */
+[data-theme="dark"][data-accent="purple"] {
+  --primary-light: #2e1f4a;
+  --primary-dark: #d0b3ff;
+}
+[data-theme="dark"][data-accent="green"] {
+  --primary-light: #1f3a25;
+  --primary-dark: #95e8a3;
+}
+[data-theme="dark"][data-accent="blue"] {
+  --primary-light: #1f3a52;
+  --primary-dark: #b3e1ff;
+}
+[data-theme="dark"][data-accent="orange"] {
+  --primary-light: #3d2818;
+  --primary-dark: #ffae7a;
+}
+
+/* =============================================================
+   Honor system theme on first load when no explicit choice yet
+   (the JS sets data-theme to "light" | "dark" before first paint,
+   so this is mostly a fallback for users who disable JS)
+   ============================================================= */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #1a1226;
+    --surface: #261b3a;
+    --primary-light: #3a2547;
+    --primary-dark: #ffa3d0;
+    --secondary-light: #1f3a52;
+    --accent-light: #3d3520;
+    --green-light: #1f3a25;
+    --orange-light: #3d2818;
+    --purple-light: #2e1f4a;
+    --text: #f0e8fa;
+    --text-soft: #b0a4c2;
+    --text-faint: #6a5a85;
+    --border: #3a2d4f;
+    --border-strong: #4a3d5f;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.65);
+  }
+}
