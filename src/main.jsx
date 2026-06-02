@@ -131,7 +131,19 @@ function ParentRoute({ tab, profile, setProfile, navigate }) {
       <header class="parent-header">
         <div class="parent-header__brand">
           <div class="parent-header__logo">🌟</div>
-          <h1>{STRINGS.app.name} — Parent</h1>
+          <h1>
+          {STRINGS.app.name} — Parent{' '}
+          <span
+            style={{
+              fontSize: '0.5em',
+              fontWeight: 'normal',
+              opacity: 0.45,
+              letterSpacing: '0.04em'
+            }}
+          >
+            ({import.meta.env.VITE_GIT_SHA})
+          </span>
+        </h1>
         </div>
         <button
           class="btn btn--ghost btn--small"

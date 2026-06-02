@@ -250,18 +250,6 @@ export function Settings({ profile, setProfile }) {
           {STRINGS.parent.settings.save}
         </button>
       </div>
-
-      <div
-        style={{
-          textAlign: 'center',
-          fontSize: '0.65rem',
-          color: 'var(--text-soft)',
-          marginTop: '24px',
-          letterSpacing: '0.05em'
-        }}
-      >
-        {STRINGS.parent.settings.versionLabel} {import.meta.env.VITE_GIT_SHA}
-      </div>
     </div>
   );
 }

@@ -184,8 +184,7 @@ export const STRINGS = {
         }
       },
       save: 'Save settings',
-      saved: 'Settings saved!',
-      versionLabel: 'Build'
+      saved: 'Settings saved!'
     }
   }
 };
