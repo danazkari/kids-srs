@@ -13,7 +13,11 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "deploy": "bun run build && bun --env-file=.env run surge:only",
+    "deploy:preview": "bun run build && bun --env-file=.env run surge:preview",
+    "surge:only": "surge dist $SURGE_DOMAIN",
+    "surge:preview": "surge dist ${SURGE_DOMAIN:-preview.surge.sh} --preview"
   },
   "dependencies": {
     "chart.js": "^4.4.4",
