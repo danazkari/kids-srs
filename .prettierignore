@@ -6,3 +6,5 @@ public
 coverage
 .env
 .env.*
+e2e/reports
+e2e/screenshots

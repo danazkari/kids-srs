@@ -8,8 +8,10 @@ export default [
       'node_modules/**',
       'public/**',
       'coverage/**',
+      'e2e/**',
       '*.min.js',
       '*.config.js',
+      '*.cjs',
       'vite.config.js'
     ]
   },

@@ -17,7 +17,11 @@
     "deploy": "bun run build && bun --env-file=.env run surge:only",
     "deploy:preview": "bun run build && bun --env-file=.env run surge:preview",
     "surge:only": "surge dist $SURGE_DOMAIN",
-    "surge:preview": "surge dist ${SURGE_DOMAIN:-preview.surge.sh} --preview"
+    "surge:preview": "surge dist ${SURGE_DOMAIN:-preview.surge.sh} --preview",
+    "test:e2e": "bun run build && bunx cucumber-js",
+    "test:e2e:smoke": "bun run build && bunx cucumber-js --profile smoke",
+    "test:e2e:headed": "E2E_HEADED=1 bun run build && bunx cucumber-js",
+    "test:e2e:debug": "E2E_DEBUG=1 E2E_HEADED=1 bun run build && bunx cucumber-js"
   },
   "dependencies": {
     "chart.js": "^4.4.4",
@@ -25,11 +29,15 @@
     "preact": "^10.24.1"
   },
   "devDependencies": {
+    "@cucumber/cucumber": "^13.0.0",
+    "@cucumber/html-formatter": "^23.1.0",
     "@eslint/js": "^10",
+    "@playwright/test": "^1.60.0",
     "@preact/preset-vite": "^2.9.1",
     "eslint": "^10",
     "globals": "^17",
     "happy-dom": "^20.9.0",
+    "playwright": "^1.60.0",
     "prettier": "^3",
     "vite": "^5.4.8",
     "vite-plugin-pwa": "^0.20.5",
