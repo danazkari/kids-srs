@@ -1,0 +1,11 @@
+{
+  "name": "Mixed deck",
+  "language": "en-US",
+  "tags": ["e2e", "mixed"],
+  "cards": [
+    { "id": "m-spell", "type": "spelling", "prompt": "Animal", "answer": "cat" },
+    { "id": "m-phrase", "type": "phrase", "prompt": "Greeting", "answer": "hello" },
+    { "id": "m-fact", "type": "fact", "prompt": "Capital of France", "answer": "Paris" },
+    { "id": "m-audio", "type": "audio", "prompt": "Say it", "answer": "bonjour" }
+  ]
+}
