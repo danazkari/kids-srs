@@ -122,18 +122,11 @@ export function Dashboard() {
     });
   }, [filtered, dailyLabels]);
 
-  // Mastery doughnut (across all decks in range, or all time for 'all')
-  const mastery = useMemo(() => {
-    let n = 0, l = 0, m = 0, o = 0;
-    const now = Date.now();
-    for (const s of srsList) {
-      if (!s.lastReviewed && !s.reps) { n++; continue; }
-      if (s.interval >= 7) m++;
-      else l++;
-      if (s.due < now - DAY_MS) o++;
-    }
-    return { new: n, learning: l, mastered: m, overdue: o };
-  }, [srsList]);
+  // Mastery doughnut (across all decks in range, or all time for 'all').
+  // Buckets are mutually exclusive: overdue takes priority over the
+  // interval-based buckets, since "is this card late?" is a separate
+  // question from "how well-known is it?".
+  const mastery = useMemo(() => computeMastery(srsList), [srsList]);
 
   // Hardest cards: top 10 by lapses
   const deckById = useMemo(() => new Map(decks.map((d) => [d.id, d])), [decks]);
@@ -323,6 +316,17 @@ export function Dashboard() {
       )}
     </div>
   );
+}
+
+export function computeMastery(srsList, now = Date.now()) {
+  let n = 0, l = 0, m = 0, o = 0;
+  for (const s of srsList) {
+    if (!s.lastReviewed && !s.reps) { n++; continue; }
+    if (s.due < now - DAY_MS) { o++; continue; }
+    if (s.interval >= 7) m++;
+    else l++;
+  }
+  return { new: n, learning: l, mastered: m, overdue: o };
 }
 
 function calcStreak(allSessions) {
