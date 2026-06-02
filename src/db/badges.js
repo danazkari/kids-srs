@@ -22,11 +22,17 @@ export async function awardBadge(id) {
 export async function awardBadges(ids) {
   const db = await getDb();
   const tx = db.transaction('badges', 'readwrite');
+  // The idb library exposes the object store as a wrapped store
+  // whose methods return promises (no raw IDBRequest, no
+  // onsuccess/onerror boilerplate). Using the wrapped methods
+  // keeps the transaction alive across microtask boundaries and
+  // avoids the request-await footgun.
+  const store = tx.objectStore('badges');
   const newlyAwarded = [];
   for (const id of ids) {
-    const existing = await tx.store.get(id);
+    const existing = await store.get(id);
     if (!existing) {
-      await tx.store.put({ id, earnedAt: Date.now() });
+      await store.put({ id, earnedAt: Date.now() });
       newlyAwarded.push(id);
     }
   }
