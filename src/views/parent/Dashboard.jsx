@@ -5,14 +5,13 @@ import { getAllSrs } from '../../db/srs.js';
 import { listBadges } from '../../db/badges.js';
 import { BADGES, BADGE_BY_ID } from '../../badges/definitions.js';
 import { STRINGS } from '../../i18n.js';
-import { todayIso, startOfDay } from '../../utils/index.js';
+import { todayIso, startOfDay, calcStreak } from '../../utils/index.js';
+const DAY_MS = 86_400_000;
 import { cssVar } from '../../theme.js';
 import { LineChart } from './charts/LineChart.jsx';
 import { BarChart } from './charts/BarChart.jsx';
 import { DoughnutChart } from './charts/DoughnutChart.jsx';
 import { Heatmap } from './charts/Heatmap.jsx';
-
-const DAY_MS = 86_400_000;
 const RANGES = [
   { id: 'd7', label: 'Last 7 days', days: 7 },
   { id: 'd30', label: 'Last 30 days', days: 30 },
@@ -388,20 +387,4 @@ export function computeMastery(srsList, now = Date.now()) {
     else l++;
   }
   return { new: n, learning: l, mastered: m, overdue: o };
-}
-
-function calcStreak(allSessions) {
-  if (!allSessions.length) return 0;
-  const completed = allSessions.filter((s) => s.completedAt && !s.abandoned);
-  if (!completed.length) return 0;
-  const dates = new Set(completed.map((s) => s.date));
-  const today = startOfDay(Date.now());
-  let cursor = dates.has(today) ? today : today - DAY_MS;
-  if (!dates.has(todayIso(new Date(cursor)))) return 0;
-  let streak = 0;
-  while (dates.has(todayIso(new Date(cursor)))) {
-    streak++;
-    cursor -= DAY_MS;
-  }
-  return streak;
 }

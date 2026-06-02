@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'preact/hooks';
 import { getDeck, countDue } from '../../db/decks.js';
 import { getSrsForDeck, putSrs } from '../../db/srs.js';
-import { createSession, updateSession, findResumableSession } from '../../db/sessions.js';
+import { createSession, updateSession, findResumableSession, listSessions } from '../../db/sessions.js';
 import { listBadges, awardBadges } from '../../db/badges.js';
 import { newSrsState, applyGrade, GRADE } from '../../srs/algorithm.js';
 import { buildSessionQueue, srsMapFromList } from '../../srs/queue.js';
 import { collectBadgeContext, computeEligibleBadgeIds } from '../../badges/evaluator.js';
-import { listSessions } from '../../db/sessions.js';
 import { listDecks } from '../../db/decks.js';
+import { calcStreak } from '../../utils/index.js';
 import { cancelSpeech } from '../../speech/index.js';
 import { ProgressBar } from '../../components/ProgressBar.jsx';
 import { Modal } from '../../components/Modal.jsx';
@@ -132,9 +132,6 @@ export function Session({ deckId, profile, navigate }) {
       if (card.type === 'spelling') {
         if (result.grade === GRADE.PASS) {
           newSession.cardsCorrect = (newSession.cardsCorrect || 0) + 1;
-          setStreak((s) => s + 1);
-        } else {
-          setStreak(0);
         }
       } else {
         if (result.grade === GRADE.PASS)
@@ -142,8 +139,6 @@ export function Session({ deckId, profile, navigate }) {
         else if (result.grade === GRADE.ALMOST)
           newSession.selfGrades.almost = (newSession.selfGrades.almost || 0) + 1;
         else newSession.selfGrades.notYet = (newSession.selfGrades.notYet || 0) + 1;
-        if (result.grade === GRADE.PASS) setStreak((s) => s + 1);
-        else setStreak(0);
       }
       newSession.currentIndex = index + 1;
       newSession.durationSeconds = Math.round((Date.now() - newSession.startedAt) / 1000);
@@ -200,6 +195,12 @@ export function Session({ deckId, profile, navigate }) {
       setTimeout(() => setNewBadgesToShow(newlyAwarded), 600);
     }
   }
+
+  // Compute consecutive-days streak at done-screen render time.
+  useEffect(() => {
+    if (!done) return;
+    listSessions().then((sessions) => setStreak(calcStreak(sessions)));
+  }, [done]);
 
   // Loading / error states
   if (loading) {

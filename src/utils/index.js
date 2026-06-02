@@ -60,3 +60,21 @@ export function formatDuration(seconds) {
 export function pluralize(n, singular, plural) {
   return `${n} ${n === 1 ? singular : plural || singular + 's'}`;
 }
+
+const DAY_MS = 86_400_000;
+
+export function calcStreak(allSessions) {
+  if (!allSessions.length) return 0;
+  const completed = allSessions.filter((s) => s.completedAt && !s.abandoned);
+  if (!completed.length) return 0;
+  const dates = new Set(completed.map((s) => s.date));
+  const today = startOfDay(Date.now());
+  let cursor = dates.has(today) ? today : today - DAY_MS;
+  if (!dates.has(todayIso(new Date(cursor)))) return 0;
+  let streak = 0;
+  while (dates.has(todayIso(new Date(cursor)))) {
+    streak++;
+    cursor -= DAY_MS;
+  }
+  return streak;
+}

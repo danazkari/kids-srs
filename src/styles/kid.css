@@ -212,9 +212,6 @@
   color: var(--text-soft);
   font-weight: 700;
 }
-.session-streak {
-  color: var(--accent);
-}
 
 .progress-bar {
   height: 10px;

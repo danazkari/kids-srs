@@ -21,7 +21,6 @@ export const STRINGS = {
     },
     session: {
       cardN: (i, n) => `Card ${i} of ${n}`,
-      streak: (n) => `Streak: ${n}`,
       tapToSeeAnswer: 'Tap to see the answer',
       knewIt: 'I knew it!',
       almost: 'Almost!',
@@ -30,7 +29,6 @@ export const STRINGS = {
       submit: 'Check',
       next: 'Next',
       done: 'Done!',
-      tryAgain: 'Try again',
       audioReplay: 'Play sound again',
       leaveConfirm: 'Leave this session?',
       leaveConfirmBody: 'You can come back later!',
@@ -39,7 +37,6 @@ export const STRINGS = {
       doneTitle: 'Great job! 🎉',
       doneSub: (cards) => `You reviewed ${cards} ${cards === 1 ? 'card' : 'cards'}.`,
       doneHome: 'Back to home',
-      spellingTryAgain: 'Try once more!',
       keepGoing: 'Keep going!',
       perfect: 'Perfect round! ✨',
       resumed: "Welcome back! Let's keep going."

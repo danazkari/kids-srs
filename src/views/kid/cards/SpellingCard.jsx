@@ -38,14 +38,7 @@ export function SpellingCard({ card, layout, onResult, registerKeys }) {
     onResult && onResult({ advance: true });
   }
 
-  function tryAgain() {
-    setTyped('');
-    setSubmitted(false);
-    setResult(null);
-  }
-
   const compare = submitted ? letterCompare(typed, card.answer) : [];
-  const correctAnswer = card.answer;
 
   return (
     <div class="study-card study-card--spelling anim-fade">
@@ -54,7 +47,7 @@ export function SpellingCard({ card, layout, onResult, registerKeys }) {
       {!submitted ? (
         <>
           <div class="letter-boxes" aria-label={STRINGS.kid.session.typeHere}>
-            {Array.from({ length: Math.max(typed.length, 1) }).map((_, i) => (
+            {Array.from({ length: card.answer.length }).map((_, i) => (
               <div key={i} class={`letter-box ${i < typed.length ? '' : 'letter-box--blank'}`}>
                 {typed[i] ? typed[i].toUpperCase() : ''}
               </div>
@@ -70,24 +63,14 @@ export function SpellingCard({ card, layout, onResult, registerKeys }) {
             {compare.map((c, i) => (
               <div
                 key={i}
-                class={`letter-box ${c.status === 'correct' ? 'letter-box--correct' : 'letter-box--wrong'}`}
+                class={`letter-box ${c.status === 'missing' || c.status === 'correct' ? 'letter-box--correct' : 'letter-box--wrong'}`}
                 aria-label={c.status}
               >
-                {c.status === 'missing' ? '' : c.char.toUpperCase()}
+                {c.char.toUpperCase()}
               </div>
             ))}
           </div>
-          {result === 'wrong' && (
-            <div class="spelling-correction">
-              {STRINGS.kid.session.spellingTryAgain} {correctAnswer}
-            </div>
-          )}
           <div class="spelling-actions">
-            {result === 'wrong' && (
-              <button class="btn btn--accent btn--lg" onClick={tryAgain}>
-                {STRINGS.kid.session.tryAgain}
-              </button>
-            )}
             <button class="btn btn--secondary btn--lg" onClick={next}>
               {STRINGS.kid.session.next}
             </button>
