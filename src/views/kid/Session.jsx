@@ -141,24 +141,6 @@ export function Session({ deckId, profile, navigate }) {
         correct: (updated.cardsCorrect || 0) + (updated.selfGrades?.knew || 0),
         total: updated.cardsReviewed
       });
-
-      // First card badge
-      if (updated.cardsReviewed === 1) {
-        const sessions = await listSessions();
-        const decks = await listDecks();
-        const ctx = collectBadgeContext({ sessions, srsList: [], decks, lastSession: updated });
-        const eligible = computeEligibleBadgeIds(ctx);
-        const owned = await listBadges();
-        const ownedIds = new Set(owned.map((b) => b.id));
-        const newOnes = eligible.filter((id) => !ownedIds.has(id));
-        if (newOnes.length) {
-          const awarded = await awardBadges(newOnes);
-          if (awarded.length) {
-            setBadgesEarned((prev) => [...prev, ...awarded]);
-            setNewBadgesToShow(awarded);
-          }
-        }
-      }
     },
     [session, deck, queue, index]
   );
@@ -281,9 +263,7 @@ export function Session({ deckId, profile, navigate }) {
           🏠
         </button>
         <div class="kid-top-bar__title">{deck.name}</div>
-        <div style={{ minWidth: '48px', textAlign: 'right' }} class="session-streak">
-          ⚡{streak}
-        </div>
+        <span style={{ minWidth: '48px' }} aria-hidden="true" />
       </header>
 
       <div class="kid-session">

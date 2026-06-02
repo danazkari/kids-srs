@@ -38,7 +38,7 @@ export function AudioCard({ card, deck, audioSettings, onResult }) {
   }
 
   function grade(g) {
-    onResult && onResult({ grade: g });
+    onResult && onResult({ grade: g, advance: true });
   }
 
   if (!flipped) {

@@ -6,7 +6,7 @@ export function PhraseCard({ card, onResult }) {
   const [flipped, setFlipped] = useState(false);
 
   function grade(g) {
-    onResult && onResult({ grade: g });
+    onResult && onResult({ grade: g, advance: true });
   }
 
   if (!flipped) {
