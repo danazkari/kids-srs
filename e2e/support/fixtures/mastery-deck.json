@@ -1,0 +1,11 @@
+{
+  "name": "Mastery test",
+  "language": "en-US",
+  "tags": ["e2e", "mastery"],
+  "cards": [
+    { "id": "mst-1", "type": "spelling", "prompt": "A", "answer": "alpha" },
+    { "id": "mst-2", "type": "spelling", "prompt": "B", "answer": "bravo" },
+    { "id": "mst-3", "type": "spelling", "prompt": "C", "answer": "charlie" },
+    { "id": "mst-4", "type": "spelling", "prompt": "D", "answer": "delta" }
+  ]
+}
