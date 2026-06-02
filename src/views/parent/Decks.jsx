@@ -282,7 +282,7 @@ function ReplaceCardsModal({ deck, onClose, onReplaced }) {
         onDrop={(e) => { e.preventDefault(); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); }}
       >
         <div class="bold">{file ? file.name : 'Drop replacement JSON here'}</div>
-        <div class="dropzone__hint">Cards keep their IDs — SRS state is preserved for unchanged cards.</div>
+        <div class="dropzone__hint">Unchanged cards keep their progress; new cards start fresh, removed cards are dropped.</div>
         <input
           ref={inputRef}
           type="file"

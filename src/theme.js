@@ -1,8 +1,10 @@
 // Theme application: writes data-theme + data-accent to <html> and listens
 // to system color-scheme changes when the user picks "system".
 
+import { ACCENT_COLORS, DEFAULT_ACCENT } from './theme-colors.js';
+
 const VALID_THEMES = new Set(['light', 'dark', 'system']);
-const VALID_ACCENTS = new Set(['pink', 'purple', 'green', 'blue', 'orange']);
+const VALID_ACCENTS = new Set(Object.keys(ACCENT_COLORS));
 
 let _systemListener = null;
 
@@ -18,7 +20,7 @@ function _apply(theme, accent) {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
   const resolved = resolveTheme(theme);
-  const safeAccent = VALID_ACCENTS.has(accent) ? accent : 'pink';
+  const safeAccent = VALID_ACCENTS.has(accent) ? accent : DEFAULT_ACCENT;
   root.setAttribute('data-theme', resolved);
   root.setAttribute('data-accent', safeAccent);
   root.style.colorScheme = resolved;

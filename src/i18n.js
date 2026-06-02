@@ -125,7 +125,7 @@ export const STRINGS = {
       },
       replace: {
         title: 'Replace cards?',
-        body: (summary) => `${summary.added} new, ${summary.removed} removed, ${summary.unchanged} unchanged. SRS progress will be reset for changed cards.`,
+        body: (summary) => `${summary.added} new, ${summary.removed} removed, ${summary.unchanged} unchanged. Unchanged cards keep their progress; new cards start fresh.`,
         yes: 'Replace',
         no: 'Cancel'
       },
