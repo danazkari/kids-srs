@@ -4,6 +4,10 @@ A spaced-repetition study web app for young children (ages 5–8). Fully offline
 
 See `SPEC.md` (the spec this was built from) for full feature details.
 
+## Threat model
+
+The parent dashboard is guarded by a multiplication gate (a × b where a, b ∈ 2..9, with a 60-second cooldown after three wrong answers). **This is a child-resistance nudge, not a security control.** A motivated user can clear `sessionStorage.parent-authed` in DevTools and walk right in. The gate exists so a child playing with the device doesn't accidentally land in the parent's view. Don't try to "harden" it into something that resists a real adversary — that's not what it's for, and it would be the wrong hill to die on anyway because all the data is already on the device.
+
 ## Stack
 
 - **Vite** + **Preact** (ES modules, JSX)

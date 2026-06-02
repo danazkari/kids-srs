@@ -6,7 +6,6 @@
       "name": "kids-srs",
       "dependencies": {
         "chart.js": "^4.4.4",
-        "chartjs-chart-matrix": "^2.0.1",
         "idb": "^8.0.0",
         "preact": "^10.24.1",
       },
@@ -394,8 +393,6 @@
     "caniuse-lite": ["caniuse-lite@1.0.30001793", "", {}, "sha512-iwSsYWaCOoh26cV8NwNRViHlrfUvYsHDfRVcbtmw0Kg6PJIZZXwMkj1442FYLBGkeUf1juAsU3DTfxW579mrPA=="],
 
     "chart.js": ["chart.js@4.5.1", "", { "dependencies": { "@kurkle/color": "^0.3.0" } }, "sha512-GIjfiT9dbmHRiYi6Nl2yFCq7kkwdkp1W/lp2J99rX0yo9tgJGn3lKQATztIjb5tVtevcBtIdICNWqlq5+E8/Pw=="],
-
-    "chartjs-chart-matrix": ["chartjs-chart-matrix@2.1.1", "", { "peerDependencies": { "chart.js": ">=3.0.0" } }, "sha512-hJ5NKGYqfM37mnkr3XXIJDn9Eij4G7mbNsNxY1zEmtoVLu/k6HO9yL8sL8vFgVnJbhWqAJdlrb+dlTOFKh8xfA=="],
 
     "commander": ["commander@2.20.3", "", {}, "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ=="],
 
