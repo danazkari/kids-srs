@@ -358,7 +358,11 @@ export function Session({ deckId, profile, navigate }) {
           </button>
           <button
             class="btn btn--ghost"
-            onClick={() => {
+            onClick={async () => {
+              const resumable = await findResumableSession(deckId);
+              if (resumable)
+                await updateSession(resumable.id, { completedAt: Date.now(), abandoned: true });
+              await startNew(deck, null);
               setShowResume(false);
             }}
           >
