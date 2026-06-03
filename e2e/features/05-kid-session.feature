@@ -38,12 +38,12 @@ Feature: Kid study session
     Then I see the spelling card is correct
     And I see "Next"
 
-  Scenario: Spelling card: wrong answer shows correction and try again
+  Scenario: Spelling card: wrong answer shows correction and next button
     When I import and activate the "spelling-deck" deck
     And I am on the session page for the "Spelling only" deck
     And I type "dog" and submit the spelling card
     Then I see the spelling card is wrong
-    And I see "Try again"
+    And I see "Next"
 
   Scenario: Phrase card grade button advances
     When I import and activate the "two-phrase-deck" deck

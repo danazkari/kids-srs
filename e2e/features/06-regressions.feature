@@ -34,3 +34,15 @@ Feature: Session regressions
     And I click the "Two phrase cards" deck
     Then I do not see "All done for today!"
     And I see a study card
+
+  Scenario: Completed session starts fresh without prompting
+    When I import and activate the "two-phrase-deck" deck
+    And I am on the kid home page
+    And I click the "Two phrase cards" deck
+    And I grade the phrase card as "I knew it"
+    And I advance through all remaining cards
+    Then I see the done screen
+    When I click the done screen home button
+    And I start a session for the "Two phrase cards" deck
+    Then I do not see the resume modal
+    And I see a study card

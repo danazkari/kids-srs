@@ -17,7 +17,16 @@ export const DEFAULT_SESSION_SIZE = { spelling: 4, phrase: 3, fact: 2, audio: 3 
  */
 export function buildSessionQueue({ cards, srsByCardId, sessionSize, now = Date.now() }) {
   if (!Array.isArray(cards) || cards.length === 0) return [];
-  const limits = { ...DEFAULT_SESSION_SIZE, ...(sessionSize || {}) };
+  const overrides = sessionSize || {};
+  const limits = { ...DEFAULT_SESSION_SIZE, ...overrides };
+  // If every cap is explicitly 0, fall back to defaults so the queue is
+  // never artificially empty. This prevents the "all done for today" trap
+  // when a parent sets all session sizes to 0 in Settings.
+  const allZero = TYPE_KEYS.every((t) => (overrides[t] === 0 || overrides[t] === undefined));
+  if (allZero && Object.keys(overrides).some((k) => overrides[k] === 0)) {
+    // At least one override was explicitly 0 — use defaults to unblock the session.
+    Object.assign(limits, DEFAULT_SESSION_SIZE);
+  }
 
   // Group due/new cards by type.
   const dueByType = { spelling: [], phrase: [], fact: [], audio: [] };

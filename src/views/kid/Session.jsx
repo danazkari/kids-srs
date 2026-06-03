@@ -55,10 +55,9 @@ export function Session({ deckId, profile, navigate }) {
           return;
         }
         if (resumable) {
-          if (resumable.abandoned) {
-            // Abandoned session: skip the modal, start a fresh session
-            // immediately so the kid can study remaining cards (countDue
-            // may be 0 because prior answers are already in srsState).
+          if (resumable.completedAt || resumable.abandoned) {
+            // Completed or abandoned session: start fresh immediately
+            // (no modal — a finished session should not be resumed).
             await startNew(d, null);
           } else {
             // In-progress session: show resume modal.

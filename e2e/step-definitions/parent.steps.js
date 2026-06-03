@@ -236,6 +236,24 @@ When('I change the kid\'s name to {string}', async function (name) {
   await input.fill(name);
 });
 
+When('I go to the parent settings and set all session sizes to 0', async function () {
+  await this.gotoParent('settings');
+  await this.solveGateIfPresent();
+  // The session size section has four inputs with labels matching
+  // STRINGS.parent.settings.session.{spelling,phrase,fact,audio}.
+  const types = ['spelling', 'phrase', 'fact', 'audio'];
+  for (const t of types) {
+    const row = this.page.locator('.form-row', { hasText: new RegExp(t, 'i') });
+    const input = row.locator('input[type="number"]');
+    await input.fill('0');
+  }
+});
+
+When('I save the settings', async function () {
+  await this.page.getByRole('button', { name: 'Save settings' }).click();
+  await this.page.locator('.toast', { hasText: 'Settings saved!' }).waitFor({ state: 'visible', timeout: 5_000 });
+});
+
 Then('the kid\'s name is {string}', async function (name) {
   // The greeting is "Hi <name>! 👋" on the kid home.
   await this.gotoKidHome();

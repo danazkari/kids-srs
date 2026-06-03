@@ -21,11 +21,9 @@ When('I import and activate the {string} deck', async function (fixtureName) {
 });
 
 When('I start a session for the {string} deck', async function (deckName) {
-  await this.gotoKidHome();
-  await this.page.locator('.kid-view').first().waitFor({ state: 'visible' });
-  // The deck card has a "Start" CTA.
-  const deckCard = this.page.locator('.deck-card', { hasText: deckName });
-  await deckCard.locator('button.deck-card__cta').first().click();
+  const deckId = await this.getDeckIdByName(deckName);
+  if (!deckId) throw new Error(`Deck "${deckName}" not found in database`);
+  await this.gotoSession(deckId);
   await this.page.locator('.kid-session').first().waitFor({ state: 'visible', timeout: 10_000 });
 });
 
@@ -55,6 +53,10 @@ Then('I do not see the leave confirm modal', async function () {
 
 Then('I see the resume modal', async function () {
   await expect(this.page.getByText("Welcome back!")).toBeVisible();
+});
+
+Then('I do not see the resume modal', async function () {
+  await expect(this.page.getByText("Welcome back!")).toHaveCount(0);
 });
 
 // ----- Spelling card -----
@@ -152,4 +154,36 @@ Then('the done screen shows the {string} badge', async function (badgeName) {
 
 Then('I see a study card', async function () {
   await expect(this.page.locator('.card-area').first()).toBeVisible({ timeout: 10_000 });
+});
+
+When('I click the done screen home button', async function () {
+  await this.page.locator('.done-screen button').first().click();
+  await this.gotoKidHome();
+  await this.page.waitForLoadState('networkidle');
+});
+
+When('I advance through all remaining cards', async function () {
+  // Keep grading the current card as "I knew it" until the done screen appears.
+  // Each grade auto-advances for phrase/audio cards.
+  let attempts = 0;
+  while (attempts < 20) {
+    const doneVisible = await this.page.locator('.done-screen').first().isVisible().catch(() => false);
+    if (doneVisible) break;
+    // Wait for a flippable card to be visible.
+    const flippable = this.page.locator('.card-area .study-card--flippable');
+    try {
+      await flippable.waitFor({ state: 'visible', timeout: 3_000 });
+    } catch {
+      // No more flippable cards — we might be on a non-flippable card or done.
+      break;
+    }
+    await flippable.click();
+    // Grade as "I knew it"
+    const gradeBtn = this.page
+      .locator('.grade-row .grade-btn', { hasText: /I knew it/i })
+      .first();
+    await gradeBtn.waitFor({ state: 'visible', timeout: 5_000 });
+    await gradeBtn.click();
+    attempts++;
+  }
 });

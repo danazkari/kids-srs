@@ -86,3 +86,10 @@ Then('the URL hash is {string}', async function (hash) {
   const actual = await this.page.evaluate(() => window.location.hash);
   expect(actual).toBe(hash);
 });
+
+When('I navigate to the session for the {string} deck', async function (deckName) {
+  const deckId = await this.getDeckIdByName(deckName);
+  if (!deckId) throw new Error(`Deck "${deckName}" not found in database`);
+  await this.gotoSession(deckId);
+  await this.page.waitForLoadState('domcontentloaded');
+});

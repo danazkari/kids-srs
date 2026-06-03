@@ -122,6 +122,24 @@ describe('buildSessionQueue', () => {
     });
     expect(q).toHaveLength(4);
   });
+
+  it('falls back to defaults when all caps are explicitly 0', () => {
+    const cards = [
+      card('a', 'spelling'),
+      card('b', 'spelling'),
+      card('c', 'phrase'),
+      card('d', 'fact'),
+      card('e', 'audio')
+    ];
+    const q = buildSessionQueue({
+      cards,
+      srsByCardId: {},
+      sessionSize: { spelling: 0, phrase: 0, fact: 0, audio: 0 }
+    });
+    // Should use DEFAULT_SESSION_SIZE (spelling:4, phrase:3, fact:2, audio:3)
+    // which exceeds the available cards, so all 5 cards are returned.
+    expect(q).toHaveLength(5);
+  });
 });
 
 describe('srsMapFromList', () => {
