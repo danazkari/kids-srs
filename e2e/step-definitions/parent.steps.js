@@ -332,3 +332,52 @@ Given('the service worker has registered', async function () {
 When('I go offline', async function () {
   await this.context.setOffline(true);
 });
+
+// ----- Timed sessions -----
+
+When('I enable timed sessions', async function () {
+  await this.gotoParent('settings');
+  await this.solveGateIfPresent();
+  const toggle = this.page.locator('.checkbox-row', { hasText: /enable timed sessions/i });
+  await toggle.locator('input[type="checkbox"]').check();
+});
+
+When('I add a {string} minute timer to the available options', async function (mins) {
+  await this.gotoParent('settings');
+  await this.solveGateIfPresent();
+  const input = this.page.locator('.add-timer-input');
+  await input.fill(mins);
+  await input.press('Enter');
+});
+
+When('I set the default timer to {string} minutes', async function (mins) {
+  const select = this.page.locator('select').last();
+  await select.selectOption(mins);
+});
+
+Then('timed sessions are enabled with {string} as the default', async function (mins) {
+  await this.gotoParent('settings');
+  await this.solveGateIfPresent();
+  const enabled = await this.page.locator('.checkbox-row', { hasText: /enable timed sessions/i }).locator('input[type="checkbox"]').isChecked();
+  expect(enabled).toBe(true);
+  const select = this.page.locator('select').last();
+  await expect(select).toHaveValue(mins);
+});
+
+Given('timed sessions are enabled with options {string}', async function (optionsStr) {
+  // optionsStr is like "[5, 10, 15]" — parse it
+  const nums = optionsStr.match(/\d+/g).map(Number);
+  await this.setTimedSessionConfig({
+    enabled: true,
+    availableTimers: nums,
+    defaultTimer: nums.length > 0 ? nums[0] : null
+  });
+});
+
+Given('timed sessions are enabled with only {string} minutes as default', async function (mins) {
+  await this.setTimedSessionConfig({
+    enabled: true,
+    availableTimers: [Number(mins)],
+    defaultTimer: Number(mins)
+  });
+});

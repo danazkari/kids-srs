@@ -90,8 +90,15 @@ function RouteSwitch({ path, params, profile, setProfile, navigate }) {
     return <Home profile={profile} navigate={navigate} />;
   }
   if (p === '/session') {
+    const timerMinutes = params.timer ? parseInt(params.timer, 10) : null;
     return (
-      <Session deckId={params.deck} profile={profile} setProfile={setProfile} navigate={navigate} />
+      <Session
+        deckId={params.deck}
+        timerMinutes={timerMinutes}
+        profile={profile}
+        setProfile={setProfile}
+        navigate={navigate}
+      />
     );
   }
   if (p === '/parent' || p.startsWith('/parent/')) {

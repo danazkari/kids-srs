@@ -1,7 +1,7 @@
 import { getDb } from './index.js';
 import { uuid, todayIso } from '../utils/index.js';
 
-export async function createSession({ deckId }) {
+export async function createSession({ deckId, timerMinutes = null }) {
   const db = await getDb();
   const session = {
     id: uuid(),
@@ -14,7 +14,11 @@ export async function createSession({ deckId }) {
     cardsReviewed: 0,
     cardsCorrect: 0,
     selfGrades: { knew: 0, almost: 0, notYet: 0 },
-    durationSeconds: 0
+    durationSeconds: 0,
+    timerMinutes,
+    endedByTimer: false,
+    pausedAt: null,
+    pauseDuration: 0
   };
   await db.put('sessions', session);
   return session;

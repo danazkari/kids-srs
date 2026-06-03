@@ -59,7 +59,8 @@ export function Settings({ profile, setProfile }) {
       settings: {
         ...d.settings,
         ...p,
-        sessionSize: { ...d.settings.sessionSize, ...(p.sessionSize || {}) }
+        sessionSize: { ...d.settings.sessionSize, ...(p.sessionSize || {}) },
+        timedSession: { ...d.settings.timedSession, ...(p.timedSession || {}) }
       }
     }));
   }
@@ -240,6 +241,97 @@ export function Settings({ profile, setProfile }) {
             onInput={(e) => patchSettings({ sessionTimeLimit: Number(e.currentTarget.value) })}
           />
         </div>
+      </div>
+
+      <div class="section">
+        <h3 class="section__title" style={{ fontSize: '1.05rem' }}>
+          {STRINGS.parent.settings.timedSession.title}
+        </h3>
+        <label class="checkbox-row">
+          <input
+            type="checkbox"
+            checked={draft.settings.timedSession?.enabled ?? false}
+            onChange={(e) =>
+              patchSettings({ timedSession: { ...draft.settings.timedSession, enabled: e.currentTarget.checked } })
+            }
+          />
+          <label>{STRINGS.parent.settings.timedSession.enable}</label>
+        </label>
+
+        {draft.settings.timedSession?.enabled && (
+          <>
+            <div class="form-row" style={{ marginTop: '12px' }}>
+              <label class="label">{STRINGS.parent.settings.timedSession.availableTimers}</label>
+              <div class="timer-chips">
+                {(draft.settings.timedSession?.availableTimers || []).map((mins) => (
+                  <span key={mins} class="chip chip--accent">
+                    {mins} min
+                    <button
+                      type="button"
+                      class="chip-remove"
+                      onClick={() => {
+                        const updated = draft.settings.timedSession.availableTimers.filter((m) => m !== mins);
+                        patchSettings({
+                          timedSession: { ...draft.settings.timedSession, availableTimers: updated }
+                        });
+                      }}
+                      aria-label={`Remove ${mins} min`}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+                <label class="chip chip--secondary add-timer-label">
+                  <span>{STRINGS.parent.settings.timedSession.addTimer}</span>
+                  <input
+                    type="number"
+                    min="1"
+                    max="60"
+                    class="add-timer-input"
+                    placeholder="min"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const val = parseInt(e.currentTarget.value, 10);
+                        if (val >= 1 && !draft.settings.timedSession.availableTimers.includes(val)) {
+                          const updated = [...draft.settings.timedSession.availableTimers, val].sort(
+                            (a, b) => a - b
+                          );
+                          patchSettings({
+                            timedSession: { ...draft.settings.timedSession, availableTimers: updated }
+                          });
+                          e.currentTarget.value = '';
+                        }
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label class="label">{STRINGS.parent.settings.timedSession.defaultTimer}</label>
+              <select
+                class="select"
+                value={draft.settings.timedSession?.defaultTimer ?? ''}
+                onChange={(e) =>
+                  patchSettings({
+                    timedSession: {
+                      ...draft.settings.timedSession,
+                      defaultTimer: e.currentTarget.value ? Number(e.currentTarget.value) : null
+                    }
+                  })
+                }
+              >
+                <option value="">{STRINGS.parent.settings.timedSession.none}</option>
+                {(draft.settings.timedSession?.availableTimers || []).map((mins) => (
+                  <option key={mins} value={mins}>
+                    {mins} min
+                  </option>
+                ))}
+              </select>
+            </div>
+          </>
+        )}
       </div>
 
       <div class="section">

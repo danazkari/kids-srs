@@ -191,4 +191,33 @@ export class SRSWorld extends World {
     await this.page.getByRole('button', { name: 'Upload deck' }).click();
     await this.page.locator('.dropzone').first().waitFor({ state: 'detached', timeout: 5_000 });
   }
+
+  // Set the timed session configuration directly in IndexedDB.
+  // Call with { enabled, availableTimers, defaultTimer }.
+  async setTimedSessionConfig(config) {
+    await this.page.evaluate(async (cfg) => {
+      const dbReq = indexedDB.open('srs-kids');
+      const db = await new Promise((resolve, reject) => {
+        dbReq.onsuccess = () => resolve(dbReq.result);
+        dbReq.onerror = () => reject(dbReq.error);
+      });
+      const tx = db.transaction('meta', 'readwrite');
+      const store = tx.objectStore('meta');
+      const req = store.get('current');
+      const profile = await new Promise((resolve, reject) => {
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+      if (profile) {
+        profile.settings = profile.settings || {};
+        profile.settings.timedSession = cfg;
+        store.put(profile);
+      }
+      await new Promise((res, rej) => {
+        tx.oncomplete = () => res();
+        tx.onerror = () => rej(tx.error);
+      });
+      db.close();
+    }, config);
+  }
 }

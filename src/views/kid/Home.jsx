@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'preact/hooks';
+import { useEffect, useState, useCallback, useRef } from 'preact/hooks';
 import { listDecks, countDue } from '../../db/decks.js';
 import { listBadges } from '../../db/badges.js';
 import { STRINGS } from '../../i18n.js';
@@ -10,6 +10,10 @@ export function Home({ profile, navigate }) {
   const [badges, setBadges] = useState([]);
   const [showBadges, setShowBadges] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [openTimerDeckId, setOpenTimerDeckId] = useState(null);
+  const dropdownRef = useRef(null);
+
+  const timedSession = profile.settings?.timedSession || { enabled: false, availableTimers: [], defaultTimer: null };
 
   const refresh = useCallback(async () => {
     const all = await listDecks(false); // active only
@@ -26,11 +30,91 @@ export function Home({ profile, navigate }) {
     refresh();
   }, [refresh]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpenTimerDeckId(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   function goToParent() {
     navigate('/parent/overview');
   }
 
+  function startTimedSession(deckId, timerMinutes) {
+    setOpenTimerDeckId(null);
+    navigate(`/session?deck=${encodeURIComponent(deckId)}&timer=${timerMinutes}`);
+  }
+
   const totalDue = Object.values(dueMap).reduce((sum, c) => sum + (c?.due || 0), 0);
+
+  function renderDeckCardActions(d) {
+    const c = dueMap[d.id] || { due: 0, newCount: 0 };
+    const hasDue = c.due > 0;
+
+    if (!hasDue) {
+      return (
+        <span class="deck-card__cta deck-card__cta--done" aria-disabled="true">
+          ✅
+        </span>
+      );
+    }
+
+    const timerEnabled = timedSession.enabled && timedSession.availableTimers.length > 0;
+
+    return (
+      <div class="deck-card__actions">
+        <button
+          class="deck-card__cta"
+          onClick={() => navigate(`/session?deck=${encodeURIComponent(d.id)}`)}
+        >
+          {STRINGS.kid.home.startSession}
+        </button>
+        {timerEnabled && (
+          <div class="timer-dropdown" ref={openTimerDeckId === d.id ? dropdownRef : null}>
+            {timedSession.defaultTimer ? (
+              <button
+                class="deck-card__cta deck-card__cta--timer"
+                onClick={() => startTimedSession(d.id, timedSession.defaultTimer)}
+              >
+                ⏱️ {timedSession.defaultTimer} min
+              </button>
+            ) : (
+              <>
+                <button
+                  class="deck-card__cta deck-card__cta--timer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenTimerDeckId(openTimerDeckId === d.id ? null : d.id);
+                  }}
+                  aria-expanded={openTimerDeckId === d.id}
+                >
+                  ⏱️ {timedSession.availableTimers[0]} ▾
+                </button>
+                {openTimerDeckId === d.id && (
+                  <div class="timer-dropdown__menu">
+                    {timedSession.availableTimers.map((mins) => (
+                      <button
+                        key={mins}
+                        class="timer-dropdown__item"
+                        onClick={() => startTimedSession(d.id, mins)}
+                      >
+                        {mins} min
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div class="kid-view">
@@ -104,18 +188,7 @@ export function Home({ profile, navigate }) {
                       ))}
                     </div>
                   </div>
-                  {hasDue ? (
-                    <button
-                      class="deck-card__cta"
-                      onClick={() => navigate(`/session?deck=${encodeURIComponent(d.id)}`)}
-                    >
-                      {STRINGS.kid.home.startSession}
-                    </button>
-                  ) : (
-                    <span class="deck-card__cta deck-card__cta--done" aria-disabled="true">
-                      ✅
-                    </span>
-                  )}
+                  {renderDeckCardActions(d)}
                 </div>
               );
             })}

@@ -17,6 +17,7 @@ import { cancelSpeech } from '../../speech/index.js';
 import { ProgressBar } from '../../components/ProgressBar.jsx';
 import { Modal } from '../../components/Modal.jsx';
 import { Confetti } from '../../components/Confetti.jsx';
+import { TimerBar } from '../../components/TimerBar.jsx';
 import { BadgeModal } from './BadgeModal.jsx';
 import { SpellingCard } from './cards/SpellingCard.jsx';
 import { PhraseCard } from './cards/PhraseCard.jsx';
@@ -25,7 +26,7 @@ import { AudioCard } from './cards/AudioCard.jsx';
 import { showToast } from '../../components/toast.js';
 import { STRINGS } from '../../i18n.js';
 
-export function Session({ deckId, profile, navigate }) {
+export function Session({ deckId, timerMinutes = null, profile, navigate }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [deck, setDeck] = useState(null);
@@ -40,8 +41,46 @@ export function Session({ deckId, profile, navigate }) {
   const [done, setDone] = useState(false);
   const [confettiTick, setConfettiTick] = useState(0);
   const [stats, setStats] = useState({ correct: 0, total: 0 });
+  const [timerExpired, setTimerExpired] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [showRestartOverlay, setShowRestartOverlay] = useState(false);
+  const [currentPausedAt, setCurrentPausedAt] = useState(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const srsMapRef = useRef(new Map());
+  const timerMinutesRef = useRef(timerMinutes);
+  const pausedForModalRef = useRef(false);
+
+  // Keep timerMinutes ref up to date
+  useEffect(() => {
+    timerMinutesRef.current = timerMinutes;
+  }, [timerMinutes]);
+
+  // Pause timer when leave confirm is shown, resume when it closes
+  useEffect(() => {
+    if (!timerMinutesRef.current || !session) return;
+
+    if (showLeaveConfirm && !isPaused) {
+      pausedForModalRef.current = true;
+      const now = Date.now();
+      updateSession(session.id, { pausedAt: now }).then((updated) => {
+        setSession(updated);
+        setIsPaused(true);
+        setCurrentPausedAt(now);
+      });
+    } else if (!showLeaveConfirm && isPaused && pausedForModalRef.current) {
+      pausedForModalRef.current = false;
+      const now = Date.now();
+      const pauseMs = currentPausedAt ? now - currentPausedAt : 0;
+      updateSession(session.id, {
+        pausedAt: null,
+        pauseDuration: (session.pauseDuration || 0) + pauseMs
+      }).then((updated) => {
+        setSession(updated);
+        setIsPaused(false);
+        setCurrentPausedAt(null);
+      });
+    }
+  }, [showLeaveConfirm, isPaused, session, currentPausedAt]);
 
   // Timer effect
   useEffect(() => {
@@ -63,26 +102,21 @@ export function Session({ deckId, profile, navigate }) {
         if (!d) throw new Error('Deck not found');
         if (cancelled) return;
         setDeck(d);
-        // Offer to resume same-day session (including abandoned ones)
         const resumable = await findResumableSession(deckId);
         const { due } = await countDue(deckId);
         if (due === 0 && !resumable) {
-          // Nothing due and no session history today — show empty state
           setLoading(false);
           return;
         }
         if (resumable) {
           if (resumable.completedAt || resumable.abandoned) {
-            // Completed or abandoned session: start fresh immediately
-            // (no modal — a finished session should not be resumed).
-            await startNew(d, null);
+            await startNew(d, null, timerMinutesRef.current);
           } else {
-            // In-progress session: show resume modal.
-            await startNew(d, resumable);
+            await startNew(d, resumable, null);
             setShowResume(true);
           }
         } else {
-          await startNew(d);
+          await startNew(d, null, timerMinutesRef.current);
         }
         if (!cancelled) setLoading(false);
       } catch (e) {
@@ -98,7 +132,7 @@ export function Session({ deckId, profile, navigate }) {
     };
   }, [deckId]);
 
-  async function startNew(d, resumeSession = null) {
+  async function startNew(d, resumeSession = null, timerMins = null) {
     const srsList = await getSrsForDeck(d.id);
     const srsMap = srsMapFromList(srsList);
     srsMapRef.current = srsMap;
@@ -109,32 +143,50 @@ export function Session({ deckId, profile, navigate }) {
       return;
     }
     if (resumeSession) {
-      // Recreate queue, but skip ahead
       setSession(resumeSession);
       setIndex(Math.min(resumeSession.currentIndex || 0, q.length - 1));
       setQueue(q);
     } else {
-      const s = await createSession({ deckId: d.id });
+      const s = await createSession({ deckId: d.id, timerMinutes: timerMins });
       setSession(s);
       setIndex(0);
       setQueue(q);
     }
   }
 
+  const handlePauseToggle = useCallback(async () => {
+    if (!session || !timerMinutesRef.current) return;
+
+    if (isPaused) {
+      // Resume: calculate paused duration and update session
+      const now = Date.now();
+      const pauseMs = currentPausedAt ? now - currentPausedAt : 0;
+      const updated = await updateSession(session.id, {
+        pausedAt: null,
+        pauseDuration: (session.pauseDuration || 0) + pauseMs
+      });
+      setSession(updated);
+      setIsPaused(false);
+      setCurrentPausedAt(null);
+    } else {
+      // Pause: record pausedAt timestamp
+      const updated = await updateSession(session.id, { pausedAt: Date.now() });
+      setSession(updated);
+      setIsPaused(true);
+      setCurrentPausedAt(Date.now());
+    }
+  }, [session, isPaused, currentPausedAt]);
+
   // Card result handler
   const onCardResult = useCallback(
     async (result) => {
       if (!session || !deck) return;
-      // Bare `advance` (no grade) means the user clicked "Next" after
-      // a grade was already applied — spelling cards do this so the
-      // user can read the correction before moving on.
       if (result.advance && result.grade === undefined) {
         setIndex((i) => i + 1);
         return;
       }
       if (result.grade === undefined) return;
       const card = queue[index];
-      // Update SRS state
       const existing = srsMapRef.current.get(card.id);
       const state = existing
         ? applyGrade(existing, result.grade)
@@ -142,7 +194,6 @@ export function Session({ deckId, profile, navigate }) {
       srsMapRef.current.set(card.id, state);
       await putSrs(state);
 
-      // Update session counters
       const newSession = { ...session };
       newSession.cardsReviewed = (newSession.cardsReviewed || 0) + 1;
       if (card.type === 'spelling') {
@@ -164,35 +215,47 @@ export function Session({ deckId, profile, navigate }) {
         correct: (updated.cardsCorrect || 0) + (updated.selfGrades?.knew || 0),
         total: updated.cardsReviewed
       });
-      // Advance to the next card. Phrase/Audio cards pass
-      // {grade, advance: true}; spelling cards omit `advance` and
-      // advance themselves after the user clicks "Next".
+
+      // If timer expired and this was the last card, end session
+      if (result.advance && timerExpired && index + 1 >= queue.length) {
+        // Timer expired during this card — complete session now
+        await finalizeSession(updated);
+        return;
+      }
+
       if (result.advance) {
         setIndex((i) => i + 1);
       }
     },
-    [session, deck, queue, index]
+    [session, deck, queue, index, timerExpired]
   );
 
-  // When the queue is finished
+  // When the queue is finished (normal completion or timer-triggered)
   useEffect(() => {
     if (loading) return;
     if (!session) return;
     if (queue.length === 0) return;
     if (index >= queue.length) {
+      // If timer expired and we're out of cards, end session
+      if (timerExpired) {
+        finalizeSession(session);
+        return;
+      }
+      // If queue empty but time remains, restart queue
+      if (timerMinutesRef.current && !timerExpired) {
+        triggerQueueRestart();
+        return;
+      }
       completeSession();
     }
-  }, [index, queue.length, session, loading]);
+  }, [index, queue.length, session, loading, timerExpired]);
 
-  async function completeSession() {
-    if (!session) return;
-    if (session.completedAt) return;
-    const final = await updateSession(session.id, {
+  async function finalizeSession(sess) {
+    const final = await updateSession(sess.id, {
       completedAt: Date.now(),
-      durationSeconds: Math.round((Date.now() - session.startedAt) / 1000)
+      durationSeconds: Math.round((Date.now() - sess.startedAt) / 1000),
+      endedByTimer: timerExpired
     });
-
-    // Re-evaluate all badges
     const [sessions, decks, owned] = await Promise.all([listSessions(), listDecks(), listBadges()]);
     const ctx = collectBadgeContext({ sessions, srsList: [], decks, lastSession: final });
     const eligible = computeEligibleBadgeIds(ctx);
@@ -201,15 +264,37 @@ export function Session({ deckId, profile, navigate }) {
     let newlyAwarded = [];
     if (newOnes.length) newlyAwarded = await awardBadges(newOnes);
 
-    if (newlyAwarded.length) {
-      setBadgesEarned((prev) => [...prev, ...newlyAwarded]);
-    }
+    if (newlyAwarded.length) setBadgesEarned((prev) => [...prev, ...newlyAwarded]);
 
     setDone(true);
     setConfettiTick((t) => t + 1);
-    if (newlyAwarded.length) {
-      setTimeout(() => setNewBadgesToShow(newlyAwarded), 600);
+    if (newlyAwarded.length) setTimeout(() => setNewBadgesToShow(newlyAwarded), 600);
+  }
+
+  async function triggerQueueRestart() {
+    setShowRestartOverlay(true);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    if (!session) return;
+    const srsList = await getSrsForDeck(deck.id);
+    const srsMap = srsMapFromList(srsList);
+    srsMapRef.current = srsMap;
+    const size = deck.sessionSize || profile.settings.sessionSize;
+    const q = buildSessionQueue({ cards: deck.cards, srsByCardId: srsMap, sessionSize: size });
+    if (q.length === 0) {
+      // Nothing due — show all done
+      setShowRestartOverlay(false);
+      setQueue([]);
+      return;
     }
+    setQueue(q);
+    setIndex(0);
+    setShowRestartOverlay(false);
+  }
+
+  async function completeSession() {
+    if (!session) return;
+    if (session.completedAt) return;
+    await finalizeSession(session);
   }
 
   // Compute consecutive-days streak at done-screen render time.
@@ -259,11 +344,20 @@ export function Session({ deckId, profile, navigate }) {
 
   if (done) {
     const isPerfect = stats.correct === stats.total && stats.total > 0;
+    const endedByTimer = session?.endedByTimer;
     return (
       <div class="done-screen anim-fade">
         <Confetti trigger={confettiTick} />
-        <div class="big-emoji">{isPerfect ? '✨' : '🎉'}</div>
-        <h1>{isPerfect ? STRINGS.kid.session.perfect : STRINGS.kid.session.doneTitle}</h1>
+        <div class="big-emoji">
+          {endedByTimer ? '⏱️' : isPerfect ? '✨' : '🎉'}
+        </div>
+        <h1>
+          {endedByTimer
+            ? STRINGS.kid.session.timerExpired
+            : isPerfect
+            ? STRINGS.kid.session.perfect
+            : STRINGS.kid.session.doneTitle}
+        </h1>
         <p class="text-soft">{STRINGS.kid.session.doneSub(stats.total)}</p>
         <div class="done-screen__stats">
           <div class="done-stat">
@@ -311,12 +405,49 @@ export function Session({ deckId, profile, navigate }) {
 
       <div class="kid-session">
         <div class="session-header">
+          {timerMinutes && session && (
+            <TimerBar
+              timerMinutes={timerMinutes}
+              startedAt={session.startedAt}
+              pausedAt={session.pausedAt}
+              pauseDuration={session.pauseDuration || 0}
+              onPauseToggle={handlePauseToggle}
+              isPaused={isPaused}
+            />
+          )}
           <div class="session-progress-row">
             <div>{STRINGS.kid.session.cardN(Math.min(index + 1, total), total)}</div>
             <div class="spacer" />
           </div>
           <ProgressBar value={index} max={total} label="session progress" />
         </div>
+
+        {showRestartOverlay && (
+          <div class="more-cards-overlay">
+            <div class="more-cards-overlay__content">
+              <div class="more-cards-overlay__emoji">🔄</div>
+              <div class="more-cards-overlay__title">{STRINGS.kid.session.moreCardsComing}</div>
+              <div class="circular-countdown">
+                <svg viewBox="0 0 36 36" class="circular-countdown__svg">
+                  <circle
+                    cx="18"
+                    cy="18"
+                    r="16"
+                    fill="none"
+                    stroke="var(--accent)"
+                    strokeWidth="2"
+                    strokeDasharray="100"
+                    strokeDashoffset="0"
+                    strokeLinecap="round"
+                    class="circular-countdown__ring"
+                  />
+                </svg>
+                <span class="circular-countdown__text">3</span>
+              </div>
+              <div class="more-cards-overlay__sub">{STRINGS.kid.session.restartIn}...</div>
+            </div>
+          </div>
+        )}
 
         <div class="card-area">
           {card && card.type === 'spelling' && (

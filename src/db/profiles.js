@@ -10,7 +10,12 @@ export const DEFAULT_SETTINGS = {
   audioAutoPlay: true,
   audioReplayButton: true,
   theme: 'light', // 'light' | 'dark' | 'system'
-  accent: 'pink' // 'pink' | 'purple' | 'green' | 'blue' | 'orange'
+  accent: 'pink', // 'pink' | 'purple' | 'green' | 'blue' | 'orange'
+  timedSession: {
+    enabled: false,
+    availableTimers: [5, 10, 15],
+    defaultTimer: null
+  }
 };
 
 export async function getCurrentProfile() {

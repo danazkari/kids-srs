@@ -39,7 +39,11 @@ export const STRINGS = {
       doneHome: 'Back to home',
       keepGoing: 'Keep going!',
       perfect: 'Perfect round! ✨',
-      resumed: "Welcome back! Let's keep going."
+      resumed: "Welcome back! Let's keep going.",
+      paused: 'Paused',
+      timerExpired: "Time's up!",
+      moreCardsComing: 'More cards on the way! 🎉',
+      restartIn: 'restarting in'
     },
     badges: {
       title: 'My Badges',
@@ -158,6 +162,16 @@ export const STRINGS = {
         phrase: 'Phrase cards per session',
         fact: 'Fact cards per session',
         audio: 'Audio cards per session'
+      },
+      timedSession: {
+        title: 'Timed sessions',
+        enable: 'Enable timed sessions',
+        availableTimers: 'Available timers (minutes)',
+        addTimer: 'Add',
+        removeTimer: 'Remove',
+        defaultTimer: 'Default timer',
+        none: 'None',
+        minMinutes: 'min 1 minute'
       },
       audio: {
         title: 'Speech & audio',
