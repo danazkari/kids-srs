@@ -381,3 +381,24 @@ Given('timed sessions are enabled with only {string} minutes as default', async 
     defaultTimer: Number(mins)
   });
 });
+
+// ----- GitHub Import -----
+
+When('I click the GitHub button in the decks section', async function () {
+  await this.solveGateIfPresent();
+  await this.page.getByText('GitHub').click();
+  await this.page.locator('.github-modal').waitFor({ state: 'visible', timeout: 5_000 });
+});
+
+When('I enter {string} in the repo input', async function (repo) {
+  await this.page.locator('.github-modal input[placeholder*="owner/repo"]').fill(repo);
+});
+
+Then('the {string} button is disabled', async function (btnText) {
+  const btn = this.page.locator('.github-modal button', { hasText: btnText });
+  await expect(btn).toBeDisabled();
+});
+
+Then('I see {string} error', async function (errorText) {
+  await expect(this.page.locator('.github-modal .alert--error')).toContainText(errorText);
+});

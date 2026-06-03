@@ -140,6 +140,24 @@ export const STRINGS = {
         yes: 'Replace',
         no: 'Cancel'
       },
+      githubImport: {
+        title: 'Import from GitHub',
+        repoPlaceholder: 'owner/repo or owner/repo:path',
+        fetchFiles: 'Fetch files',
+        fetching: 'Loading...',
+        noJsonFiles: 'No .json files found at this path.',
+        reImport: 'Re-import',
+        alreadyImported: 'Imported',
+        cardsCount: (n) => `${n} ${n === 1 ? 'card' : 'cards'}`,
+        importButton: (n) => `Import ${n} ${n === 1 ? 'deck' : 'decks'}`,
+        errors: {
+          repoNotFound: 'Repo not found — check the owner/repo spelling.',
+          rateLimited: 'GitHub rate limit reached. Try again in a few minutes.',
+          networkError: "Couldn't reach GitHub. Check your connection.",
+          invalidFormat: 'Invalid format. Use owner/repo or owner/repo:path',
+          fetchFailed: 'Failed to fetch files. Check the repo and path.'
+        }
+      },
       edit: {
         title: 'Edit deck',
         name: 'Name',

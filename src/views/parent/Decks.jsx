@@ -15,6 +15,7 @@ import { Modal } from '../../components/Modal.jsx';
 import { showToast } from '../../components/toast.js';
 import { getVoices, getVoicesForLanguage } from '../../speech/index.js';
 import { STRINGS } from '../../i18n.js';
+import { GitHubModal } from './GitHubModal.jsx';
 
 export function Decks() {
   const [decks, setDecks] = useState([]);
@@ -23,6 +24,7 @@ export function Decks() {
   const [deleting, setDeleting] = useState(null);
   const [replacing, setReplacing] = useState(null);
   const [adding, setAdding] = useState(false);
+  const [showGitHub, setShowGitHub] = useState(false);
   const [dueMap, setDueMap] = useState({});
   const [allTags, setAllTags] = useState([]);
 
@@ -51,9 +53,14 @@ export function Decks() {
     <div>
       <div class="section__head">
         <h2 class="section__title">{STRINGS.parent.decks.title}</h2>
-        <button class="btn" onClick={() => setAdding(true)}>
-          + {STRINGS.parent.decks.addButton}
-        </button>
+        <div class="add-deck-dropdown">
+          <button class="btn" onClick={() => setAdding(true)}>
+            + {STRINGS.parent.decks.addButton}
+          </button>
+          <button class="btn btn--secondary" onClick={() => setShowGitHub(true)}>
+            ⭐ GitHub
+          </button>
+        </div>
       </div>
 
       <div class="row" style={{ marginBottom: '12px' }}>
@@ -106,6 +113,15 @@ export function Decks() {
           }}
         />
       )}
+
+      <GitHubModal
+        open={showGitHub}
+        onClose={() => setShowGitHub(false)}
+        onImport={async () => {
+          await refresh();
+        }}
+      />
+
       {editing && (
         <EditDeckModal
           deck={editing}

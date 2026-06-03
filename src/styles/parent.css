@@ -597,3 +597,147 @@
   outline: none;
   border-color: var(--primary);
 }
+
+/* Add deck dropdown */
+.add-deck-dropdown {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* GitHub Modal */
+.github-modal {
+  max-width: 560px;
+  width: 100%;
+}
+
+.github-modal .modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.github-modal .modal__header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.github-modal .modal__body {
+  padding: var(--space-4);
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.github-modal .modal__footer {
+  padding: var(--space-4);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.github-repo-input {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.github-repo-input .input {
+  flex: 1;
+}
+
+.github-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  color: var(--text-soft);
+}
+
+.github-file-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.github-file-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.github-file-row--imported {
+  background: var(--primary-light);
+  opacity: 0.8;
+}
+
+.github-file-row__name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-soft);
+}
+
+.github-file-row__deck-name {
+  flex: 1;
+  font-size: 0.95rem;
+}
+
+.github-file-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+}
+
+/* Modal backdrop and container (same as kid.css for consistency) */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: var(--space-4);
+}
+
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.modal__header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.modal__close {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: var(--text-soft);
+  padding: 4px 8px;
+  border-radius: var(--radius);
+}
+
+.modal__close:hover {
+  background: var(--border);
+}

@@ -18,6 +18,12 @@ export async function getDeck(id) {
   return db.get('decks', id);
 }
 
+export async function getDeckBySource(repo, path) {
+  const db = await getDb();
+  const all = await db.getAll('decks');
+  return all.find((d) => d.sourceRepo === repo && d.sourcePath === path) || null;
+}
+
 export async function createDeck(input) {
   const db = await getDb();
   const now = Date.now();
@@ -31,7 +37,13 @@ export async function createDeck(input) {
     sessionSize: input.sessionSize || null,
     cards: input.cards.map(normalizeCard),
     createdAt: now,
-    updatedAt: now
+    updatedAt: now,
+    source: input.source || 'file',
+    sourceUrl: input.sourceUrl || null,
+    sourceRepo: input.sourceRepo || null,
+    sourcePath: input.sourcePath || null,
+    sourceCommit: input.sourceCommit || null,
+    importedAt: input.importedAt || now
   };
   await db.put('decks', deck);
   return deck;
@@ -81,10 +93,17 @@ export async function replaceCards(deckId, newCards) {
 
   // Reset SRS for added cards (they're new). For removed cards, delete state.
   const tx = db.transaction(['decks', 'srsState'], 'readwrite');
+  const now = Date.now();
   const updatedDeck = {
     ...deck,
     cards: newCards.map(normalizeCard),
-    updatedAt: Date.now()
+    updatedAt: Date.now(),
+    source: deck.source || 'file',
+    sourceUrl: deck.sourceUrl || null,
+    sourceRepo: deck.sourceRepo || null,
+    sourcePath: deck.sourcePath || null,
+    sourceCommit: deck.sourceCommit || null,
+    importedAt: deck.importedAt || now
   };
   await tx.objectStore('decks').put(updatedDeck);
   for (const id of removedIds) {
