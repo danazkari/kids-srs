@@ -1,0 +1,142 @@
+{
+  "name": "Les outils de la classe — avec articles",
+  "language": "fr-FR",
+  "tags": ["french", "vocabulary", "classroom", "articles", "year1"],
+  "cards": [
+    {
+      "id": "ar01",
+      "type": "audio",
+      "emoji": "🎒",
+      "image": "https://raw.githubusercontent.com/danazkari/kids-srs/main/decks/imgs/sac-a-dos.jpg",
+      "prompt": "",
+      "answer": "un sac-à-dos",
+      "sentence": null
+    },
+    {
+      "id": "ar02",
+      "type": "audio",
+      "emoji": "👜",
+      "image": "https://raw.githubusercontent.com/danazkari/kids-srs/main/decks/imgs/trousse.jpeg",
+      "prompt": "",
+      "answer": "une trousse",
+      "sentence": null
+    },
+    {
+      "id": "ar03",
+      "type": "audio",
+      "emoji": "📓",
+      "image": "https://raw.githubusercontent.com/danazkari/kids-srs/main/decks/imgs/cahier.jpg",
+      "prompt": "",
+      "answer": "un cahier",
+      "sentence": null
+    },
+    {
+      "id": "ar04",
+      "type": "audio",
+      "emoji": "📚",
+      "image": "https://raw.githubusercontent.com/danazkari/kids-srs/main/decks/imgs/livre.avif",
+      "prompt": "",
+      "answer": "un livre",
+      "sentence": null
+    },
+    {
+      "id": "ar05",
+      "type": "audio",
+      "emoji": "🪑",
+      "image": "https://raw.githubusercontent.com/danazkari/kids-srs/main/decks/imgs/table.jpg",
+      "prompt": "",
+      "answer": "une table",
+      "sentence": null
+    },
+    {
+      "id": "ar06",
+      "type": "audio",
+      "emoji": "🟩",
+      "image": "https://raw.githubusercontent.com/danazkari/kids-srs/main/decks/imgs/tableu.jpg",
+      "prompt": "",
+      "answer": "un tableau",
+      "sentence": null
+    },
+    {
+      "id": "ar07",
+      "type": "audio",
+      "emoji": "🖊️",
+      "image": "https://raw.githubusercontent.com/danazkari/kids-srs/main/decks/imgs/stylo.png",
+      "prompt": "",
+      "answer": "un stylo",
+      "sentence": null
+    },
+    {
+      "id": "ar08",
+      "type": "audio",
+      "emoji": "✏️",
+      "image": "https://raw.githubusercontent.com/danazkari/kids-srs/main/decks/imgs/crayon.jpg",
+      "prompt": "",
+      "answer": "un crayon",
+      "sentence": null
+    },
+    {
+      "id": "ar09",
+      "type": "audio",
+      "emoji": "🔧",
+      "image": "https://raw.githubusercontent.com/danazkari/kids-srs/main/decks/imgs/traille-crayon.jpg",
+      "prompt": "",
+      "answer": "un taille-crayon",
+      "sentence": null
+    },
+    {
+      "id": "ar10",
+      "type": "audio",
+      "emoji": "🩹",
+      "image": "https://raw.githubusercontent.com/danazkari/kids-srs/main/decks/imgs/gomme.webp",
+      "prompt": "",
+      "answer": "une gomme",
+      "sentence": null
+    },
+    {
+      "id": "ar11",
+      "type": "audio",
+      "emoji": "🧴",
+      "image": "https://raw.githubusercontent.com/danazkari/kids-srs/main/decks/imgs/colle.webp",
+      "prompt": "",
+      "answer": "une colle",
+      "sentence": null
+    },
+    {
+      "id": "ar12",
+      "type": "audio",
+      "emoji": "📏",
+      "image": "https://raw.githubusercontent.com/danazkari/kids-srs/main/decks/imgs/regle.jpg",
+      "prompt": "",
+      "answer": "une règle",
+      "sentence": null
+    },
+    {
+      "id": "ar13",
+      "type": "audio",
+      "emoji": "🖌️",
+      "image": "https://raw.githubusercontent.com/danazkari/kids-srs/main/decks/imgs/feutre.jpeg",
+      "prompt": "",
+      "answer": "un feutre",
+      "sentence": null
+    },
+    {
+      "id": "ar14",
+      "type": "audio",
+      "emoji": "✂️",
+      "image": "https://raw.githubusercontent.com/danazkari/kids-srs/main/decks/imgs/cisaux.jpg",
+      "prompt": "",
+      "answer": "des ciseaux",
+      "sentence": null
+    },
+    {
+      "id": "ar15",
+      "type": "audio",
+      "emoji": "🖍️",
+      "image": "https://raw.githubusercontent.com/danazkari/kids-srs/main/decks/imgs/crayons-de-couleurs.jpg",
+      "prompt": "",
+      "answer": "des crayons de couleurs",
+      "sentence": null
+    }
+  ]
+}
