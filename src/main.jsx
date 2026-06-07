@@ -11,6 +11,7 @@ import { reapOldIncompleteSessions } from './db/sessions.js';
 import { loadDefaultDecks } from './db/decks.js';
 import { getVoices, onVoicesChanged } from './speech/index.js';
 import { applyTheme } from './theme.js';
+import { exposeE2EHelpers } from './e2e-helpers.js';
 
 import { useRoute, useNavigate } from './router.js';
 import { ToastHost } from './components/ToastHost.jsx';
@@ -40,6 +41,14 @@ function App() {
         if (!cancelled) {
           setProfile(p);
           setReady(true);
+          exposeE2EHelpers();
+          if (import.meta.env.VITE_E2E_BUILD === 'true') {
+            // Set in both storage areas so the Gate check in ParentRoute
+            // survives clearAllStorage (which clears sessionStorage but
+            // preserves localStorage) and survives the setDeckRepos reload.
+            sessionStorage.setItem('parent-authed', '1');
+            localStorage.setItem('parent-authed', '1');
+          }
         }
       } catch (e) {
         if (!cancelled) setBootError(e.message || String(e));
@@ -116,12 +125,16 @@ function RouteSwitch({ path, params, profile, setProfile, navigate }) {
 }
 
 function ParentRoute({ tab, profile, setProfile, navigate }) {
-  const [authed, setAuthed] = useState(() => sessionStorage.getItem('parent-authed') === '1');
+  const isAuthed = () =>
+    sessionStorage.getItem('parent-authed') === '1' ||
+    localStorage.getItem('parent-authed') === '1';
+  const [authed, setAuthed] = useState(isAuthed);
   if (!authed) {
     return (
       <Gate
         onSuccess={() => {
           sessionStorage.setItem('parent-authed', '1');
+          localStorage.setItem('parent-authed', '1');
           setAuthed(true);
         }}
         onCancel={() => navigate('/')}
@@ -130,7 +143,7 @@ function ParentRoute({ tab, profile, setProfile, navigate }) {
   }
   const activeTab = tab || 'overview';
   let content;
-  if (activeTab === 'decks') content = <Decks />;
+  if (activeTab === 'decks') content = <Decks profile={profile} setProfile={setProfile} />;
   else if (activeTab === 'settings')
     content = <Settings profile={profile} setProfile={setProfile} />;
   else content = <Dashboard />;

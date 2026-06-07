@@ -17,7 +17,7 @@ import { getVoices, getVoicesForLanguage } from '../../speech/index.js';
 import { STRINGS } from '../../i18n.js';
 import { GitHubModal } from './GitHubModal.jsx';
 
-export function Decks() {
+export function Decks({ profile, setProfile }) {
   const [decks, setDecks] = useState([]);
   const [statusFilter, setStatusFilter] = useState('all');
   const [editing, setEditing] = useState(null);
@@ -117,6 +117,8 @@ export function Decks() {
       <GitHubModal
         open={showGitHub}
         onClose={() => setShowGitHub(false)}
+        deckRepos={profile?.settings?.deckRepos || []}
+        setProfile={setProfile}
         onImport={async () => {
           await refresh();
         }}

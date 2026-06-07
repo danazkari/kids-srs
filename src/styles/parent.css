@@ -741,3 +741,103 @@
 .modal__close:hover {
   background: var(--border);
 }
+
+/* Deck Repositories (Settings) */
+.repo-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-2);
+  background: var(--surface);
+  gap: var(--space-3);
+}
+
+.repo-row__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.repo-row__name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.repo-default-dot {
+  color: var(--primary);
+  font-size: 0.7rem;
+}
+
+.repo-default-label {
+  font-size: 0.75rem;
+  color: var(--primary);
+  font-weight: 400;
+  background: var(--primary-light);
+  padding: 1px 6px;
+  border-radius: 99px;
+}
+
+.repo-row__repo {
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+.repo-row__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.repo-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.repo-form .form-row {
+  margin-bottom: var(--space-2);
+}
+
+.repo-form .form-row:last-of-type {
+  margin-bottom: var(--space-2);
+}
+
+/* GitHub Modal — repo selector */
+.github-repo-label {
+  font-size: 0.95rem;
+  color: var(--text-soft);
+  flex: 1;
+}
+
+.github-no-repos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  text-align: center;
+}
+
+.github-add-repo-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.github-add-repo-form .form-row {
+  margin-bottom: var(--space-2);
+}
+
+.github-add-repo-form .input {
+  width: 100%;
+}

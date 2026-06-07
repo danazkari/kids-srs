@@ -72,7 +72,9 @@ export default defineConfig({
     sourcemap: false
   },
   define: {
-    'import.meta.env.VITE_GIT_SHA': JSON.stringify(process.env.VITE_GIT_SHA || 'dev')
+    'import.meta.env.VITE_GIT_SHA': JSON.stringify(process.env.VITE_GIT_SHA || 'dev'),
+    'import.meta.env.VITE_OFFICIAL_DECK_REPO': JSON.stringify(process.env.VITE_OFFICIAL_DECK_REPO || ''),
+    'import.meta.env.VITE_E2E_BUILD': JSON.stringify(process.env.VITE_E2E_BUILD || 'false')
   },
   test: {
     environment: 'happy-dom',

@@ -150,6 +150,11 @@ export const STRINGS = {
         alreadyImported: 'Imported',
         cardsCount: (n) => `${n} ${n === 1 ? 'card' : 'cards'}`,
         importButton: (n) => `Import ${n} ${n === 1 ? 'deck' : 'decks'}`,
+        fromRepo: 'from',
+        noRepos: 'No repositories saved.',
+        addRepoInSettings: 'Add a repository in Settings',
+        addRepoButton: '+ Add',
+        selectRepo: 'Select repository',
         errors: {
           repoNotFound: 'Repo not found — check the owner/repo spelling.',
           rateLimited: 'GitHub rate limit reached. Try again in a few minutes.',
@@ -197,19 +202,22 @@ export const STRINGS = {
         replayButton: 'Show replay button after flip',
         voiceHeading: 'Per-deck voice'
       },
-      appearance: {
-        title: 'Appearance',
-        themeHeading: 'Theme',
-        themeLight: 'Light',
-        themeDark: 'Dark',
-        themeSystem: 'Use system',
-        accentHeading: 'Accent color',
-        accentNames: {
-          pink: 'Pink',
-          purple: 'Purple',
-          green: 'Green',
-          blue: 'Blue',
-          orange: 'Orange'
+      deckRepos: {
+        title: 'Deck repositories',
+        empty: 'No repositories saved.',
+        addButton: 'Add repository',
+        namePlaceholder: 'Nickname (e.g. "Official Decks")',
+        repoPlaceholder: 'owner/repo or owner/repo:path',
+        editButton: 'Edit',
+        removeButton: 'Remove',
+        setDefaultButton: 'Set as default',
+        defaultLabel: 'default',
+        importFromRepo: 'Importing from',
+        addSubmit: 'Save',
+        addCancel: 'Cancel',
+        errors: {
+          nameRequired: 'Please enter a nickname.',
+          repoInvalid: 'Invalid format. Use owner/repo or owner/repo:path'
         }
       },
       save: 'Save settings',

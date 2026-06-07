@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
-import { DEFAULT_SETTINGS, updateSettings, updateProfile } from '../../db/profiles.js';
+import { DEFAULT_SETTINGS, updateSettings, updateProfile, addDeckRepo, updateDeckRepo, removeDeckRepo, setDefaultDeckRepo } from '../../db/profiles.js';
 import { listDecks, updateDeck } from '../../db/decks.js';
 import { getVoices, getVoicesForLanguage } from '../../speech/index.js';
 import { applyTheme } from '../../theme.js';
@@ -24,6 +24,10 @@ export function Settings({ profile, setProfile }) {
   const [draft, setDraft] = useState(null);
   const [decks, setDecks] = useState([]);
   const [voices, setVoices] = useState([]);
+  const [showAddRepo, setShowAddRepo] = useState(false);
+  const [editingRepoId, setEditingRepoId] = useState(null);
+  const [repoForm, setRepoForm] = useState({ name: '', repo: '' });
+  const [repoError, setRepoError] = useState('');
 
   useEffect(() => {
     if (profile) {
@@ -60,7 +64,8 @@ export function Settings({ profile, setProfile }) {
         ...d.settings,
         ...p,
         sessionSize: { ...d.settings.sessionSize, ...(p.sessionSize || {}) },
-        timedSession: { ...d.settings.timedSession, ...(p.timedSession || {}) }
+        timedSession: { ...d.settings.timedSession, ...(p.timedSession || {}) },
+        deckRepos: p.deckRepos !== undefined ? p.deckRepos : d.settings.deckRepos
       }
     }));
   }
@@ -94,6 +99,62 @@ export function Settings({ profile, setProfile }) {
   async function setDeckVoice(deckId, voiceURI) {
     await updateDeck(deckId, { voiceURI });
     setDecks((prev) => prev.map((d) => (d.id === deckId ? { ...d, voiceURI } : d)));
+  }
+
+  function openAddRepo() {
+    setRepoForm({ name: '', repo: '' });
+    setRepoError('');
+    setShowAddRepo(true);
+    setEditingRepoId(null);
+  }
+
+  function openEditRepo(repo) {
+    setRepoForm({ name: repo.name, repo: `${repo.repo}${repo.path ? ':' + repo.path : ''}` });
+    setRepoError('');
+    setEditingRepoId(repo.id);
+    setShowAddRepo(false);
+  }
+
+  function cancelRepoForm() {
+    setShowAddRepo(false);
+    setEditingRepoId(null);
+    setRepoError('');
+  }
+
+  function validateRepoForm(name, repoStr) {
+    if (!name.trim()) return STRINGS.parent.settings.deckRepos.errors.nameRequired;
+    const m = repoStr.match(/^([^/]+)\/([^/:]+)(?::(.+))?$/);
+    if (!m) return STRINGS.parent.settings.deckRepos.errors.repoInvalid;
+    return null;
+  }
+
+  async function handleSaveRepo() {
+    const err = validateRepoForm(repoForm.name, repoForm.repo);
+    if (err) { setRepoError(err); return; }
+    const m = repoForm.repo.match(/^([^/]+)\/([^/:]+)(?::(.+))?$/);
+    const repo = { name: repoForm.name.trim(), repo: `${m[1]}/${m[2]}`, path: m[3] || '' };
+    if (editingRepoId) {
+      const next = await updateDeckRepo(editingRepoId, repo);
+      setProfile(next);
+      setEditingRepoId(null);
+    } else {
+      const next = await addDeckRepo(repo);
+      setProfile(next);
+      setShowAddRepo(false);
+    }
+    setRepoForm({ name: '', repo: '' });
+    setRepoError('');
+  }
+
+  async function handleRemoveRepo(id) {
+    const next = await removeDeckRepo(id);
+    setProfile(next);
+    if (editingRepoId === id) cancelRepoForm();
+  }
+
+  async function handleSetDefaultRepo(id) {
+    const next = await setDefaultDeckRepo(id);
+    setProfile(next);
   }
 
   return (
@@ -366,6 +427,73 @@ export function Settings({ profile, setProfile }) {
         ))}
       </div>
 
+      <div class="section">
+        <h3 class="section__title" style={{ fontSize: '1.05rem' }}>
+          {STRINGS.parent.settings.deckRepos.title}
+        </h3>
+        {draft.settings.deckRepos?.length === 0 && !showAddRepo && !editingRepoId && (
+          <p class="text-soft" style={{ marginBottom: '12px' }}>
+            {STRINGS.parent.settings.deckRepos.empty}
+          </p>
+        )}
+        {draft.settings.deckRepos?.map((r) => (
+          <div key={r.id} class="repo-row">
+            <div class="repo-row__info">
+              <div class="repo-row__name">
+                {r.isDefault && <span class="repo-default-dot" aria-hidden="true">●</span>}
+                {r.name}
+                {r.isDefault && (
+                  <span class="repo-default-label">{STRINGS.parent.settings.deckRepos.defaultLabel}</span>
+                )}
+              </div>
+              <div class="repo-row__repo text-soft">
+                {r.repo}{r.path ? `:${r.path}` : ''}
+              </div>
+            </div>
+            <div class="repo-row__actions">
+              {editingRepoId === r.id ? (
+                <RepoForm
+                  mode="edit"
+                  form={repoForm}
+                  error={repoError}
+                  onChange={setRepoForm}
+                  onSave={handleSaveRepo}
+                  onCancel={cancelRepoForm}
+                />
+              ) : (
+                <>
+                  <button type="button" class="btn btn--sm" onClick={() => openEditRepo(r)}>
+                    {STRINGS.parent.settings.deckRepos.editButton}
+                  </button>
+                  <button type="button" class="btn btn--sm" onClick={() => handleRemoveRepo(r.id)}>
+                    {STRINGS.parent.settings.deckRepos.removeButton}
+                  </button>
+                  {!r.isDefault && (
+                    <button type="button" class="btn btn--sm btn--secondary" onClick={() => handleSetDefaultRepo(r.id)}>
+                      {STRINGS.parent.settings.deckRepos.setDefaultButton}
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+        {showAddRepo ? (
+          <RepoForm
+            mode="add"
+            form={repoForm}
+            error={repoError}
+            onChange={setRepoForm}
+            onSave={handleSaveRepo}
+            onCancel={cancelRepoForm}
+          />
+        ) : !editingRepoId && (
+          <button type="button" class="btn" style={{ marginTop: '8px' }} onClick={openAddRepo}>
+            + {STRINGS.parent.settings.deckRepos.addButton}
+          </button>
+        )}
+      </div>
+
       <div class="row" style={{ justifyContent: 'flex-end' }}>
         <button class="btn btn--lg" onClick={save}>
           {STRINGS.parent.settings.save}
@@ -409,6 +537,40 @@ function DeckVoiceRow({ deck, onChange }) {
           </option>
         ))}
       </select>
+    </div>
+  );
+}
+
+function RepoForm({ mode, form, error, onChange, onSave, onCancel }) {
+  return (
+    <div class="repo-form">
+      <div class="form-row">
+        <label class="label">{STRINGS.parent.settings.profile.name}</label>
+        <input
+          class="input"
+          placeholder={STRINGS.parent.settings.deckRepos.namePlaceholder}
+          value={form.name}
+          onInput={(e) => onChange({ ...form, name: e.currentTarget.value })}
+        />
+      </div>
+      <div class="form-row">
+        <label class="label">Repo</label>
+        <input
+          class="input"
+          placeholder={STRINGS.parent.settings.deckRepos.repoPlaceholder}
+          value={form.repo}
+          onInput={(e) => onChange({ ...form, repo: e.currentTarget.value })}
+        />
+      </div>
+      {error && <div class="text-error" style={{ fontSize: '0.85rem', marginBottom: '8px' }}>{error}</div>}
+      <div class="row" style={{ gap: '8px' }}>
+        <button type="button" class="btn btn--sm btn--accent" onClick={onSave}>
+          {STRINGS.parent.settings.deckRepos.addSubmit}
+        </button>
+        <button type="button" class="btn btn--sm" onClick={onCancel}>
+          {STRINGS.parent.settings.deckRepos.addCancel}
+        </button>
+      </div>
     </div>
   );
 }

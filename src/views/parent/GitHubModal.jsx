@@ -1,9 +1,15 @@
 import { useState } from 'preact/hooks';
 import { getDeckBySource, createDeck, updateDeck, validateDeckJson } from '../../db/decks.js';
+import { addDeckRepo } from '../../db/profiles.js';
 import { STRINGS } from '../../i18n.js';
 
-export function GitHubModal({ open, onClose, onImport }) {
-  const [repoInput, setRepoInput] = useState('');
+export function GitHubModal({ open, onClose, onImport, deckRepos = [], setProfile }) {
+  const defaultRepo = deckRepos.find((r) => r.isDefault) || deckRepos[0];
+  const [selectedRepoId, setSelectedRepoId] = useState(defaultRepo?.id || '');
+  const [customRepoInput, setCustomRepoInput] = useState('');
+  const [showAddRepo, setShowAddRepo] = useState(false);
+  const [repoForm, setRepoForm] = useState({ name: '', repo: '' });
+  const [repoFormError, setRepoFormError] = useState('');
   const [fetching, setFetching] = useState(false);
   const [error, setError] = useState(null);
   const [files, setFiles] = useState([]);
@@ -12,15 +18,22 @@ export function GitHubModal({ open, onClose, onImport }) {
 
   if (!open) return null;
 
-  function parseRepoInput(input) {
-    const m = input.match(/^([^/]+)\/([^/:]+)(?::(.+))?$/);
-    if (!m) return null;
-    return { owner: m[1], repo: m[2], path: m[3] || '' };
+  function getRepoSource() {
+    if (deckRepos.length > 0 && selectedRepoId) {
+      const repo = deckRepos.find((r) => r.id === selectedRepoId);
+      return repo ? { owner: repo.repo.split('/')[0], repo: repo.repo.split('/')[1], path: repo.path, repoObj: repo } : null;
+    }
+    if (customRepoInput.trim()) {
+      const m = customRepoInput.trim().match(/^([^/]+)\/([^/:]+)(?::(.+))?$/);
+      if (!m) return null;
+      return { owner: m[1], repo: m[2], path: m[3] || '', repoObj: null };
+    }
+    return null;
   }
 
   async function fetchFiles() {
-    const parsed = parseRepoInput(repoInput.trim());
-    if (!parsed) {
+    const src = getRepoSource();
+    if (!src) {
       setError(STRINGS.parent.decks.githubImport.errors.invalidFormat);
       return;
     }
@@ -29,7 +42,7 @@ export function GitHubModal({ open, onClose, onImport }) {
     setError(null);
 
     try {
-      const url = `https://api.github.com/repos/${parsed.owner}/${parsed.repo}/contents/${parsed.path}`;
+      const url = `https://api.github.com/repos/${src.owner}/${src.repo}/contents/${src.path}`;
       const resp = await fetch(url);
 
       if (resp.status === 404) {
@@ -66,15 +79,14 @@ export function GitHubModal({ open, onClose, onImport }) {
         return;
       }
 
-      // Fetch each file's content and check if already imported
       const fileInfos = await Promise.all(
         jsonFiles.map(async (item) => {
           try {
             const fileResp = await fetch(item.download_url);
             const content = await fileResp.json();
             const { deck } = validateDeckJson(content);
-            const sourceRepo = `${parsed.owner}/${parsed.repo}`;
-            const sourcePath = (parsed.path ? parsed.path + '/' : '') + item.name;
+            const sourceRepo = `${src.owner}/${src.repo}`;
+            const sourcePath = (src.path ? src.path + '/' : '') + item.name;
             const existingDeck = await getDeckBySource(sourceRepo, sourcePath);
 
             return {
@@ -151,7 +163,6 @@ export function GitHubModal({ open, onClose, onImport }) {
     const { content, sourceRepo, sourcePath, downloadUrl } = fileInfo;
 
     if (isReImport) {
-      // Get the sha from the file's GitHub content to store as sourceCommit
       let sourceCommit = null;
       try {
         const resp = await fetch(downloadUrl);
@@ -188,7 +199,32 @@ export function GitHubModal({ open, onClose, onImport }) {
     }
   }
 
-  const canImport = selected.size > 0 && !importing;
+  async function handleAddRepoInModal() {
+    const err = validateForm(repoForm.name, repoForm.repo);
+    if (err) { setRepoFormError(err); return; }
+    const m = repoForm.repo.match(/^([^/]+)\/([^/:]+)(?::(.+))?$/);
+    const repo = { name: repoForm.name.trim(), repo: `${m[1]}/${m[2]}`, path: m[3] || '' };
+    const next = await addDeckRepo(repo);
+    setProfile(next);
+    setSelectedRepoId(next.settings.deckRepos.find((r) => r.repo === repo.repo && r.path === repo.path)?.id || '');
+    setShowAddRepo(false);
+    setRepoForm({ name: '', repo: '' });
+    setRepoFormError('');
+  }
+
+  function validateForm(name, repoStr) {
+    if (!name.trim()) return STRINGS.parent.settings.deckRepos.errors.nameRequired;
+    const m = repoStr.match(/^([^/]+)\/([^/:]+)(?::(.+))?$/);
+    if (!m) return STRINGS.parent.settings.deckRepos.errors.repoInvalid;
+    return null;
+  }
+
+  const repoSource = getRepoSource();
+  const canFetch = repoSource && (deckRepos.length > 0 ? selectedRepoId : customRepoInput.trim());
+  const selectedRepo = deckRepos.find((r) => r.id === selectedRepoId);
+  const showDropdown = deckRepos.length > 1;
+  const showSingleRepoLabel = deckRepos.length === 1 && !showAddRepo;
+  const showCustomInput = deckRepos.length === 0 && !showAddRepo;
 
   return (
     <div class="modal-backdrop" onClick={(e) => e.target === e.currentTarget && onClose()}>
@@ -201,19 +237,96 @@ export function GitHubModal({ open, onClose, onImport }) {
         </div>
 
         <div class="modal__body">
-          <div class="github-repo-input">
-            <input
-              type="text"
-              class="input"
-              placeholder={STRINGS.parent.decks.githubImport.repoPlaceholder}
-              value={repoInput}
-              onInput={(e) => setRepoInput(e.currentTarget.value)}
-              onKeyDown={(e) => e.key === 'Enter' && fetchFiles()}
-            />
-            <button class="btn" onClick={fetchFiles} disabled={fetching || !repoInput.trim()}>
-              {fetching ? STRINGS.parent.decks.githubImport.fetching : STRINGS.parent.decks.githubImport.fetchFiles}
-            </button>
-          </div>
+          {deckRepos.length === 0 && !showAddRepo && (
+            <div class="github-no-repos">
+              <p class="text-soft">{STRINGS.parent.decks.githubImport.noRepos}</p>
+              <button type="button" class="btn btn--secondary" onClick={() => setShowAddRepo(true)}>
+                + {STRINGS.parent.decks.githubImport.addRepoButton}
+              </button>
+            </div>
+          )}
+
+          {(deckRepos.length > 0 || showAddRepo) && !showAddRepo && (
+            <div class="github-repo-input">
+              {showDropdown && (
+                <>
+                  <select
+                    class="select"
+                    value={selectedRepoId}
+                    onChange={(e) => setSelectedRepoId(e.currentTarget.value)}
+                  >
+                    {deckRepos.map((r) => (
+                      <option key={r.id} value={r.id}>{r.name}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    class="btn"
+                    onClick={() => setShowAddRepo(true)}
+                    title={STRINGS.parent.decks.githubImport.addRepoButton}
+                  >
+                    +
+                  </button>
+                </>
+              )}
+              {showSingleRepoLabel && (
+                <span class="github-repo-label">
+                  {STRINGS.parent.decks.githubImport.fromRepo} <strong>{selectedRepoLabel(selectedRepo)}</strong>
+                </span>
+              )}
+              {deckRepos.length > 0 && (
+                <button class="btn" onClick={fetchFiles} disabled={fetching || !canFetch}>
+                  {fetching ? STRINGS.parent.decks.githubImport.fetching : STRINGS.parent.decks.githubImport.fetchFiles}
+                </button>
+              )}
+            </div>
+          )}
+
+          {showCustomInput && (
+            <div class="github-repo-input">
+              <input
+                type="text"
+                class="input"
+                placeholder={STRINGS.parent.decks.githubImport.repoPlaceholder}
+                value={customRepoInput}
+                onInput={(e) => setCustomRepoInput(e.currentTarget.value)}
+                onKeyDown={(e) => e.key === 'Enter' && fetchFiles()}
+              />
+              <button class="btn" onClick={fetchFiles} disabled={fetching || !customRepoInput.trim()}>
+                {fetching ? STRINGS.parent.decks.githubImport.fetching : STRINGS.parent.decks.githubImport.fetchFiles}
+              </button>
+            </div>
+          )}
+
+          {showAddRepo && (
+            <div class="github-add-repo-form">
+              <div class="form-row">
+                <input
+                  class="input"
+                  placeholder={STRINGS.parent.settings.deckRepos.namePlaceholder}
+                  value={repoForm.name}
+                  onInput={(e) => setRepoForm({ ...repoForm, name: e.currentTarget.value })}
+                />
+              </div>
+              <div class="form-row">
+                <input
+                  class="input"
+                  placeholder={STRINGS.parent.settings.deckRepos.repoPlaceholder}
+                  value={repoForm.repo}
+                  onInput={(e) => setRepoForm({ ...repoForm, repo: e.currentTarget.value })}
+                />
+              </div>
+              {repoFormError && <div class="text-error" style={{ fontSize: '0.85rem', marginBottom: '8px' }}>{repoFormError}</div>}
+              <div class="row" style={{ gap: '8px' }}>
+                <button type="button" class="btn btn--sm btn--accent" onClick={handleAddRepoInModal}>
+                  {STRINGS.parent.settings.deckRepos.addSubmit}
+                </button>
+                <button type="button" class="btn btn--sm" onClick={() => { setShowAddRepo(false); setRepoFormError(''); }}>
+                  {STRINGS.parent.settings.deckRepos.addCancel}
+                </button>
+              </div>
+            </div>
+          )}
 
           {error && <div class="alert alert--error">{error}</div>}
 
@@ -267,7 +380,7 @@ export function GitHubModal({ open, onClose, onImport }) {
 
         {selected.size > 0 && (
           <div class="modal__footer">
-            <button class="btn btn--lg" onClick={handleImport} disabled={!canImport}>
+            <button class="btn btn--lg" onClick={handleImport} disabled={importing}>
               {importing ? STRINGS.parent.decks.githubImport.fetching : STRINGS.parent.decks.githubImport.importButton(selected.size)}
             </button>
           </div>
@@ -275,4 +388,9 @@ export function GitHubModal({ open, onClose, onImport }) {
       </div>
     </div>
   );
+}
+
+function selectedRepoLabel(repo) {
+  if (!repo) return '';
+  return `${repo.repo}${repo.path ? `:${repo.path}` : ''}`;
 }

@@ -93,6 +93,13 @@ Given('I have cleared the database', async function () {
   await this.page.locator('.kid-view').first().waitFor({ state: 'visible', timeout: 10_000 });
 });
 
+Given('the database is cleared', async function () {
+  await this.clearAllStorage();
+  await this.gotoKidHome();
+  await this.page.waitForLoadState('domcontentloaded');
+  await this.page.locator('.kid-view').first().waitFor({ state: 'visible', timeout: 10_000 });
+});
+
 // ----- Deck import flow -----
 
 When('I open the add deck modal', async function () {

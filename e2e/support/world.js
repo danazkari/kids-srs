@@ -61,7 +61,13 @@ export class SRSWorld extends World {
     await this.page.goto('about:blank');
     await this.page.evaluate(async () => {
       try {
-        localStorage.clear();
+        // Wipe everything in localStorage except the E2E parent-auth flag,
+        // which is set once by the app at boot when VITE_E2E_BUILD=true.
+        // Preserving it avoids a re-auth round-trip (and potential timing
+        // glitch) after the database is cleared.
+        for (const key of Object.keys(localStorage)) {
+          if (key !== 'parent-authed') localStorage.removeItem(key);
+        }
         sessionStorage.clear();
         // Drop every IndexedDB database.
         if (indexedDB.databases) {
@@ -100,6 +106,10 @@ export class SRSWorld extends World {
 
   async gotoParent(tab = 'overview') {
     await this._navigate(`/parent/${tab}`);
+    // Wait for the parent view to actually render. On a fresh boot the app
+    // needs a moment to load the profile and apply the E2E parent-authed flag.
+    // Use a longer timeout to handle slower scenarios (timed sessions etc.)
+    await this.page.waitForSelector('.parent-view', { timeout: 15_000 }).catch(() => {});
   }
 
   async _navigate(hashPath) {
@@ -154,20 +164,20 @@ export class SRSWorld extends World {
   // need the gate out of the way before interacting with the parent
   // Decks tab.
   async solveGateIfPresent() {
-    const gateVisible = await this.page
-      .locator('.gate-card')
-      .first()
-      .isVisible()
-      .catch(() => false);
-    if (!gateVisible) return;
+    try {
+      await this.page.locator('.gate-card').waitFor({ state: 'visible', timeout: 5_000 });
+    } catch {
+      return;
+    }
+    await this.page.locator('.gate-card__question').waitFor({ state: 'visible', timeout: 5_000 });
     const text = await this.page.locator('.gate-card__question').first().innerText();
     const m = text.match(/(\d+)\s*×\s*(\d+)/);
-    if (!m) throw new Error(`Could not parse math challenge: ${text}`);
+    if (!m) throw new Error(`Could not parse math challenge: "${text}"`);
     const answer = Number(m[1]) * Number(m[2]);
     const input = this.page.locator('.gate-card__input').first();
     await input.fill(String(answer));
     await input.press('Enter');
-    await this.page.locator('.gate-card').waitFor({ state: 'detached', timeout: 5_000 });
+    await this.page.locator('.gate-card').waitFor({ state: 'detached', timeout: 10_000 });
   }
 
   // Full import flow for a fixture deck file: navigate to parent
@@ -219,5 +229,25 @@ export class SRSWorld extends World {
       });
       db.close();
     }, config);
+  }
+
+  async setDeckRepos(repos) {
+    const currentUrl = await this.page.url();
+    if (!currentUrl.includes(this.serverUrl) || currentUrl === 'about:blank') {
+      await this.gotoKidHome();
+      await this.page.waitForSelector('.kid-view', { timeout: 10_000 });
+    }
+    await this.page.waitForFunction(
+      () => typeof window.__e2e !== 'undefined',
+      { timeout: 10_000 }
+    );
+    await this.page.evaluate(async (r) => {
+      await window.__e2e.setDeckRepos(r);
+      // Reload so the app re-bootstraps with the updated profile.
+      // parent-authed persists across the reload.
+      window.__e2e.reload();
+    }, repos);
+    // Wait for the page to reload and settle on the kid home.
+    await this.page.waitForLoadState('networkidle', { timeout: 15_000 });
   }
 }

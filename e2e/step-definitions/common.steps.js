@@ -19,6 +19,9 @@ Given('I am on the session page for deck {string}', async function (deckId) {
 Given('I am on the parent {string} tab', async function (tab) {
   await this.gotoParent(tab);
   await this.page.waitForLoadState('domcontentloaded');
+  if (tab === 'settings') {
+    await this.page.waitForTimeout(1000);
+  }
 });
 
 When('I navigate to {string}', async function (hash) {

@@ -19,6 +19,10 @@ WORKDIR /app
 ARG VITE_GIT_SHA=dev
 ENV VITE_GIT_SHA=$VITE_GIT_SHA
 
+# Skip the parent Gate in E2E — auto-auth parent mode.
+ARG VITE_E2E_BUILD=false
+ENV VITE_E2E_BUILD=$VITE_E2E_BUILD
+
 # Install deps first so the layer is cached when only source changes.
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
@@ -32,7 +36,7 @@ COPY src ./src
 COPY e2e ./e2e
 
 # Build the app once at image-build time so `docker run` is fast.
-RUN VITE_GIT_SHA=$VITE_GIT_SHA bun run build
+RUN VITE_GIT_SHA=$VITE_GIT_SHA VITE_E2E_BUILD=$VITE_E2E_BUILD bun run build
 
 # Reports and screenshots are written here. Mount these from the host
 # to keep the artifacts outside the container.

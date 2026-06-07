@@ -238,7 +238,6 @@ When('I change the kid\'s name to {string}', async function (name) {
 
 When('I go to the parent settings and set all session sizes to 0', async function () {
   await this.gotoParent('settings');
-  await this.solveGateIfPresent();
   // The session size section has four inputs with labels matching
   // STRINGS.parent.settings.session.{spelling,phrase,fact,audio}.
   const types = ['spelling', 'phrase', 'fact', 'audio'];
@@ -337,14 +336,12 @@ When('I go offline', async function () {
 
 When('I enable timed sessions', async function () {
   await this.gotoParent('settings');
-  await this.solveGateIfPresent();
   const toggle = this.page.locator('.checkbox-row', { hasText: /enable timed sessions/i });
   await toggle.locator('input[type="checkbox"]').check();
 });
 
 When('I add a {string} minute timer to the available options', async function (mins) {
   await this.gotoParent('settings');
-  await this.solveGateIfPresent();
   const input = this.page.locator('.add-timer-input');
   await input.fill(mins);
   await input.press('Enter');
@@ -357,7 +354,6 @@ When('I set the default timer to {string} minutes', async function (mins) {
 
 Then('timed sessions are enabled with {string} as the default', async function (mins) {
   await this.gotoParent('settings');
-  await this.solveGateIfPresent();
   const enabled = await this.page.locator('.checkbox-row', { hasText: /enable timed sessions/i }).locator('input[type="checkbox"]').isChecked();
   expect(enabled).toBe(true);
   const select = this.page.locator('select').last();
@@ -385,7 +381,6 @@ Given('timed sessions are enabled with only {string} minutes as default', async 
 // ----- GitHub Import -----
 
 When('I click the GitHub button in the decks section', async function () {
-  await this.solveGateIfPresent();
   await this.page.getByText('GitHub').click();
   await this.page.locator('.github-modal').waitFor({ state: 'visible', timeout: 5_000 });
 });
@@ -401,4 +396,115 @@ Then('the {string} button is disabled', async function (btnText) {
 
 Then('I see {string} error', async function (errorText) {
   await expect(this.page.locator('.github-modal .alert--error')).toContainText(errorText);
+});
+
+// ----- GitHub Import: repo selector -----
+
+When('I select the {string} repo from the dropdown', async function (repoName) {
+  const select = this.page.locator('.github-modal select');
+  await select.selectOption({ label: repoName });
+});
+
+Then('the GitHub modal shows {string} as the selected repo label', async function (expectedLabel) {
+  const label = this.page.locator('.github-repo-label strong');
+  await expect(label).toHaveText(expectedLabel);
+});
+
+Then('the GitHub modal does not show a repo dropdown', async function () {
+  const dropdown = this.page.locator('.github-modal select');
+  await expect(dropdown).toHaveCount(0);
+});
+
+Then('the GitHub modal shows the repo dropdown', async function () {
+  const dropdown = this.page.locator('.github-modal select');
+  await expect(dropdown).toBeVisible();
+});
+
+Then('the GitHub modal shows {string}', async function (text) {
+  await expect(this.page.locator('.github-modal')).toContainText(text);
+});
+
+Then('I click the + Add button in the GitHub modal', async function () {
+  await this.page.locator('.github-modal button', { hasText: '+' }).first().click();
+});
+
+When('I click the + Add button in the GitHub modal to add a repository', async function () {
+  await this.page.locator('.github-no-repos button', { hasText: '+ Add' }).click();
+});
+
+// ----- Deck Repositories (Settings) -----
+
+When('I add a repository with name {string} and repo {string}', async function (name, repo) {
+  await this.gotoParent('settings');
+  await this.page.waitForFunction(() => typeof window.__e2e !== 'undefined', { timeout: 15_000 });
+  const addBtn = this.page.locator('button', { hasText: '+ Add repository' });
+  await addBtn.waitFor({ state: 'visible', timeout: 10_000 });
+  await addBtn.click();
+  await this.page.waitForTimeout(300);
+  const inputs = this.page.locator('.repo-form input');
+  await inputs.nth(0).fill(name);
+  await inputs.nth(1).fill(repo);
+  await this.page.locator('.repo-form button', { hasText: 'Save' }).click();
+  await this.page.waitForTimeout(500);
+});
+
+When('I edit the repository to name {string} and repo {string}', async function (name, repo) {
+  const repoRow = this.page.locator('.repo-row').first();
+  await repoRow.locator('button', { hasText: 'Edit' }).click();
+  const form = this.page.locator('.repo-form');
+  await form.locator('input').nth(0).waitFor({ state: 'visible', timeout: 5_000 });
+  await form.locator('input').nth(0).fill(name);
+  await form.locator('input').nth(1).fill(repo);
+  await form.locator('button', { hasText: 'Save' }).click();
+  await this.page.locator('.repo-row__name', { hasText: name }).waitFor({ state: 'visible', timeout: 10_000 });
+});
+
+When('I remove the repository {string}', async function (name) {
+  const repoRow = this.page.locator('.repo-row', { hasText: name });
+  await repoRow.waitFor({ state: 'visible', timeout: 5_000 });
+  await repoRow.locator('button', { hasText: 'Remove' }).click();
+  await this.page.waitForTimeout(300);
+});
+
+When('I set {string} as the default repository', async function (name) {
+  const repoRow = this.page.locator('.repo-row', { hasText: name });
+  await repoRow.waitFor({ state: 'visible', timeout: 5_000 });
+  await repoRow.locator('button', { hasText: 'Set as default' }).click();
+  await this.page.waitForTimeout(300);
+});
+
+Then('the repository list shows {string}', async function (name) {
+  await this.page.locator('.repo-row__name', { hasText: name }).waitFor({ state: 'attached', timeout: 10_000 });
+});
+
+Then('the repository list shows {string} with repo {string}', async function (name, repo) {
+  const row = this.page.locator('.repo-row', { hasText: name });
+  await row.waitFor({ state: 'attached', timeout: 10_000 });
+  await expect(row.locator('.repo-row__repo')).toContainText(repo);
+});
+
+Then('the repository list no longer shows {string}', async function (name) {
+  await expect(this.page.locator('.repo-row__name', { hasText: name })).toHaveCount(0);
+});
+
+Then('{string} is marked as the default repository', async function (name) {
+  const row = this.page.locator('.repo-row', { hasText: name });
+  await row.locator('.repo-default-label').waitFor({ state: 'attached', timeout: 10_000 });
+});
+
+Then('the {string} repo is pre-selected', async function (repoName) {
+  const select = this.page.locator('.github-modal select');
+  await expect(select).toHaveValue(await select.inputValue());
+  const selectedOption = this.page.locator('.github-modal select option:checked');
+  await expect(selectedOption).toHaveText(repoName);
+});
+
+Then('the GitHub modal shows a repository name input', async function () {
+  const input = this.page.locator('.github-add-repo-form input').first();
+  await expect(input).toBeVisible();
+});
+
+Then('the GitHub modal shows a repository URL input', async function () {
+  const inputs = this.page.locator('.github-add-repo-form input');
+  await expect(inputs.nth(1)).toBeVisible();
 });
