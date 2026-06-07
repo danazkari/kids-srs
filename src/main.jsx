@@ -36,7 +36,9 @@ function App() {
       try {
         await getDb();
         await reapOldIncompleteSessions();
-        await loadDefaultDecks();
+        if (import.meta.env.VITE_E2E_BUILD !== 'true') {
+          await loadDefaultDecks();
+        }
         const p = await getCurrentProfile();
         if (!cancelled) {
           setProfile(p);
