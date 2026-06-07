@@ -1,7 +1,12 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'preact/hooks';
 import { getDeck, countDue } from '../../db/decks.js';
 import { getSrsForDeck, putSrs } from '../../db/srs.js';
-import { createSession, updateSession, findResumableSession, listSessions } from '../../db/sessions.js';
+import {
+  createSession,
+  updateSession,
+  findResumableSession,
+  listSessions
+} from '../../db/sessions.js';
 import { listBadges, awardBadges } from '../../db/badges.js';
 import { newSrsState, applyGrade, GRADE } from '../../srs/algorithm.js';
 import { buildSessionQueue, srsMapFromList } from '../../srs/queue.js';
@@ -35,7 +40,19 @@ export function Session({ deckId, profile, navigate }) {
   const [done, setDone] = useState(false);
   const [confettiTick, setConfettiTick] = useState(0);
   const [stats, setStats] = useState({ correct: 0, total: 0 });
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const srsMapRef = useRef(new Map());
+
+  // Timer effect
+  useEffect(() => {
+    if (done || loading || !session) return;
+    const interval = setInterval(() => {
+      if (session.startedAt) {
+        setElapsedSeconds(Math.floor((Date.now() - session.startedAt) / 1000));
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [done, loading, session]);
 
   // Initial setup
   useEffect(() => {
@@ -274,6 +291,12 @@ export function Session({ deckId, profile, navigate }) {
   const card = queue[index];
   const total = queue.length;
 
+  const formatTime = (secs) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return m + ':' + String(s).padStart(2, '0');
+  };
+
   return (
     <div class="kid-view">
       <header class="kid-top-bar">
@@ -281,7 +304,9 @@ export function Session({ deckId, profile, navigate }) {
           🏠
         </button>
         <div class="kid-top-bar__title">{deck.name}</div>
-        <span style={{ minWidth: '48px' }} aria-hidden="true" />
+        <div class="session-timer" aria-label="elapsed time">
+          ⏱️ {formatTime(elapsedSeconds)}
+        </div>
       </header>
 
       <div class="kid-session">
@@ -305,7 +330,9 @@ export function Session({ deckId, profile, navigate }) {
           {card && card.type === 'phrase' && (
             <PhraseCard key={card.id} card={card} onResult={onCardResult} />
           )}
-          {card && card.type === 'fact' && <FactCard key={card.id} card={card} onResult={onCardResult} />}
+          {card && card.type === 'fact' && (
+            <FactCard key={card.id} card={card} onResult={onCardResult} />
+          )}
           {card && card.type === 'audio' && (
             <AudioCard
               key={card.id}

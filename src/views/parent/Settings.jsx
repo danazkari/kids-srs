@@ -21,9 +21,15 @@ const THEMES = [
 ];
 
 export function Settings({ profile, setProfile }) {
-  const [draft, setDraft] = useState(structuredClone(profile));
+  const [draft, setDraft] = useState(null);
   const [decks, setDecks] = useState([]);
   const [voices, setVoices] = useState([]);
+
+  useEffect(() => {
+    if (profile) {
+      setDraft(structuredClone(profile));
+    }
+  }, [profile]);
 
   useEffect(() => {
     (async () => {
@@ -33,6 +39,16 @@ export function Settings({ profile, setProfile }) {
       setVoices(v);
     })();
   }, []);
+
+  if (!draft) {
+    return (
+      <div class="section">
+        <div class="empty">
+          <div class="emoji">⏳</div>
+        </div>
+      </div>
+    );
+  }
 
   function patch(p) {
     setDraft((d) => ({ ...d, ...p }));
@@ -51,17 +67,19 @@ export function Settings({ profile, setProfile }) {
   // Theme + accent get saved immediately so the live preview is also
   // persisted (no risk of losing the choice by navigating away).
   function setTheme(theme) {
+    const currentAccent = draft.settings.accent;
     patchSettings({ theme });
     updateSettings({ theme }).then((next) => {
       setProfile(next);
-      applyTheme(theme, draft.settings.accent);
+      applyTheme(theme, currentAccent);
     });
   }
   function setAccent(accent) {
+    const currentTheme = draft.settings.theme;
     patchSettings({ accent });
     updateSettings({ accent }).then((next) => {
       setProfile(next);
-      applyTheme(draft.settings.theme, accent);
+      applyTheme(currentTheme, accent);
     });
   }
 
@@ -211,6 +229,17 @@ export function Settings({ profile, setProfile }) {
             />
           </div>
         ))}
+        <div class="form-row">
+          <label class="label">Time limit (minutes, 0 = none)</label>
+          <input
+            class="input"
+            type="number"
+            min="0"
+            max="60"
+            value={draft.settings.sessionTimeLimit ?? 0}
+            onInput={(e) => patchSettings({ sessionTimeLimit: Number(e.currentTarget.value) })}
+          />
+        </div>
       </div>
 
       <div class="section">

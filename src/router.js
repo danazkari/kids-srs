@@ -39,6 +39,8 @@ export function navigate(path) {
   if (window.location.hash === next) {
     // Setting location.hash to the same value won't fire hashchange — call
     // listeners directly so the view re-renders.
+    // Always notify to ensure the component re-renders when explicitly navigating
+    // to the current path (e.g., clicking the same nav tab multiple times).
     notify();
   } else {
     window.location.hash = path;

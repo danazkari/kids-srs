@@ -1,8 +1,11 @@
-import { getDb } from './index.js';
+import { getDb, metaGet, metaSet } from './index.js';
 import { uuid, todayIso } from '../utils/index.js';
 
 const CARD_TYPES = new Set(['spelling', 'phrase', 'fact', 'audio']);
 const MAX_BASE64_IMAGE_BYTES = 500 * 1024;
+const DEFAULT_DECKS_REPO = 'danazkari/kids-srs';
+const DEFAULT_DECKS_PATH = 'decks';
+const DEFAULT_DECKS_META_KEY = 'defaultDecksLoaded';
 
 export async function listDecks(includeArchived = true) {
   const db = await getDb();
@@ -202,4 +205,59 @@ export async function countDue(deckId) {
     if (!seenCardIds.has(c.id)) newCount++;
   }
   return { due: due + newCount, dueOnly: due, newCount };
+}
+
+const DEFAULT_DECK_LIST_URL =
+  'https://api.github.com/repos/' + DEFAULT_DECKS_REPO + '/contents/' + DEFAULT_DECKS_PATH;
+
+export async function loadDefaultDecks() {
+  const alreadyLoaded = await metaGet(DEFAULT_DECKS_META_KEY, false);
+  if (alreadyLoaded) return [];
+
+  const existingDecks = await listDecks(true);
+  if (existingDecks.length > 0) {
+    await metaSet(DEFAULT_DECKS_META_KEY, true);
+    return [];
+  }
+
+  const loadedDecks = [];
+
+  try {
+    const response = await fetch(DEFAULT_DECK_LIST_URL);
+    if (!response.ok) {
+      console.warn('Failed to fetch default deck list:', response.status);
+      return [];
+    }
+
+    const files = await response.json();
+    const jsonFiles = files.filter(function (f) {
+      return f.name && f.name.endsWith('.json');
+    });
+
+    for (const file of jsonFiles) {
+      try {
+        const fileResponse = await fetch(file.download_url);
+        if (!fileResponse.ok) continue;
+
+        const raw = await fileResponse.json();
+        const result = validateDeckJson(raw);
+        if (result.warnings.length > 0) {
+          console.warn('Default deck "' + result.deck.name + '" has warnings:', result.warnings);
+        }
+
+        const created = await createDeck(result.deck);
+        loadedDecks.push(created);
+      } catch (e) {
+        console.warn('Failed to load default deck ' + file.name + ':', e);
+      }
+    }
+
+    if (loadedDecks.length > 0) {
+      await metaSet(DEFAULT_DECKS_META_KEY, true);
+    }
+  } catch (e) {
+    console.warn('Failed to load default decks:', e);
+  }
+
+  return loadedDecks;
 }

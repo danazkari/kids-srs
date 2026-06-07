@@ -6,6 +6,7 @@ const PROFILE_KEY = 'current';
 export const DEFAULT_SETTINGS = {
   keyboardLayout: 'qwerty',
   sessionSize: { spelling: 4, phrase: 3, fact: 2, audio: 3 },
+  sessionTimeLimit: 0,
   audioAutoPlay: true,
   audioReplayButton: true,
   theme: 'light', // 'light' | 'dark' | 'system'

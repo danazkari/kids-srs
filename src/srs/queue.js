@@ -22,7 +22,7 @@ export function buildSessionQueue({ cards, srsByCardId, sessionSize, now = Date.
   // If every cap is explicitly 0, fall back to defaults so the queue is
   // never artificially empty. This prevents the "all done for today" trap
   // when a parent sets all session sizes to 0 in Settings.
-  const allZero = TYPE_KEYS.every((t) => (overrides[t] === 0 || overrides[t] === undefined));
+  const allZero = TYPE_KEYS.every((t) => overrides[t] === 0 || overrides[t] === undefined);
   if (allZero && Object.keys(overrides).some((k) => overrides[k] === 0)) {
     // At least one override was explicitly 0 — use defaults to unblock the session.
     Object.assign(limits, DEFAULT_SESSION_SIZE);
@@ -79,18 +79,8 @@ export function buildSessionQueue({ cards, srsByCardId, sessionSize, now = Date.
 }
 
 function groupedShuffle(arr) {
-  // Group consecutive items with equal "due" then shuffle within group.
   if (arr.length < 2) return arr;
-  const out = [];
-  let i = 0;
-  while (i < arr.length) {
-    let j = i + 1;
-    while (j < arr.length) j++;
-    const group = arr.slice(i, j);
-    out.push(...shuffle(group));
-    i = j;
-  }
-  return out;
+  return shuffle(arr);
 }
 
 /**

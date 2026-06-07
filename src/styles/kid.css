@@ -24,6 +24,13 @@
   font-weight: 700;
 }
 
+.session-timer {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
 .icon-btn {
   width: 48px;
   height: 48px;
