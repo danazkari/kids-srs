@@ -178,6 +178,21 @@ export const STRINGS = {
     settings: {
       title: 'Settings',
       profile: { title: 'Profile', name: "Kid's name" },
+      appearance: {
+        title: 'Appearance',
+        themeHeading: 'Theme',
+        themeLight: 'Light',
+        themeDark: 'Dark',
+        themeSystem: 'System',
+        accentHeading: 'Accent color',
+        accentNames: {
+          pink: 'Pink',
+          purple: 'Purple',
+          green: 'Green',
+          blue: 'Blue',
+          orange: 'Orange'
+        }
+      },
       keyboard: { title: 'Keyboard layout', qwerty: 'QWERTY', abc: 'ABC (alphabetical)' },
       session: {
         title: 'Session size (global defaults)',
