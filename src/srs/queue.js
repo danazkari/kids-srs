@@ -13,9 +13,10 @@ export const DEFAULT_SESSION_SIZE = { spelling: 4, phrase: 3, fact: 2, audio: 3 
  * @param {Map|Array} opts.srsByCardId  - SRS state map keyed by cardId
  * @param {object} [opts.sessionSize]   - per-type counts to pick (deck or global)
  * @param {number} [opts.now]
+ * @param {boolean} [opts.unlimited]    - if true, include ALL due/new cards with no type caps; used for timed sessions
  * @returns {Array} queue of card objects
  */
-export function buildSessionQueue({ cards, srsByCardId, sessionSize, now = Date.now() }) {
+export function buildSessionQueue({ cards, srsByCardId, sessionSize, now = Date.now(), unlimited = false }) {
   if (!Array.isArray(cards) || cards.length === 0) return [];
   const overrides = sessionSize || {};
   const limits = { ...DEFAULT_SESSION_SIZE, ...overrides };
@@ -58,6 +59,24 @@ export function buildSessionQueue({ cards, srsByCardId, sessionSize, now = Date.
       // Mild shuffle to keep the same-due cards from being in deck order every time.
       dueByType[t] = groupedShuffle(dueByType[t]);
     }
+  }
+
+  // Timed session mode: include ALL due/new cards in SRS-influenced order, no caps.
+  if (unlimited) {
+    const allDue = Object.values(dueByType).flat();
+    const allNew = Object.values(newByType).flat();
+
+    // Sort due by due date ascending (most overdue first — SRS-influenced)
+    allDue.sort((a, b) => {
+      const aDue = srsByCardId instanceof Map ? srsByCardId.get(a.id)?.due : srsByCardId[a.id]?.due;
+      const bDue = srsByCardId instanceof Map ? srsByCardId.get(b.id)?.due : srsByCardId[b.id]?.due;
+      return (aDue ?? Infinity) - (bDue ?? Infinity);
+    });
+
+    // Sort new by deck array index (deterministic, no shuffle)
+    allNew.sort((a, b) => cards.indexOf(a) - cards.indexOf(b));
+
+    return [...allDue, ...allNew];
   }
 
   // Take up to the configured count from each type.

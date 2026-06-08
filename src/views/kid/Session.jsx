@@ -136,8 +136,8 @@ export function Session({ deckId, timerMinutes = null, profile, navigate }) {
     const srsList = await getSrsForDeck(d.id);
     const srsMap = srsMapFromList(srsList);
     srsMapRef.current = srsMap;
-    const size = d.sessionSize || profile.settings.sessionSize;
-    const q = buildSessionQueue({ cards: d.cards, srsByCardId: srsMap, sessionSize: size });
+    const size = timerMins ? null : (d.sessionSize || profile.settings.sessionSize);
+    const q = buildSessionQueue({ cards: d.cards, srsByCardId: srsMap, sessionSize: size, unlimited: !!timerMins });
     if (q.length === 0) {
       setQueue([]);
       return;
@@ -278,8 +278,8 @@ export function Session({ deckId, timerMinutes = null, profile, navigate }) {
     const srsList = await getSrsForDeck(deck.id);
     const srsMap = srsMapFromList(srsList);
     srsMapRef.current = srsMap;
-    const size = deck.sessionSize || profile.settings.sessionSize;
-    const q = buildSessionQueue({ cards: deck.cards, srsByCardId: srsMap, sessionSize: size });
+    const size = timerMinutesRef.current ? null : (deck.sessionSize || profile.settings.sessionSize);
+    const q = buildSessionQueue({ cards: deck.cards, srsByCardId: srsMap, sessionSize: size, unlimited: !!timerMinutesRef.current });
     if (q.length === 0) {
       // Nothing due — show all done
       setShowRestartOverlay(false);
@@ -415,11 +415,20 @@ export function Session({ deckId, timerMinutes = null, profile, navigate }) {
               isPaused={isPaused}
             />
           )}
-          <div class="session-progress-row">
-            <div>{STRINGS.kid.session.cardN(Math.min(index + 1, total), total)}</div>
-            <div class="spacer" />
-          </div>
-          <ProgressBar value={index} max={total} label="session progress" />
+          {timerMinutesRef.current ? (
+            <div class="session-progress-row">
+              <div>{stats.total} cards reviewed</div>
+              <div class="spacer" />
+            </div>
+          ) : (
+            <>
+              <div class="session-progress-row">
+                <div>{STRINGS.kid.session.cardN(Math.min(index + 1, total), total)}</div>
+                <div class="spacer" />
+              </div>
+              <ProgressBar value={index} max={total} label="session progress" />
+            </>
+          )}
         </div>
 
         {showRestartOverlay && (

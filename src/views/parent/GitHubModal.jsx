@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks';
 import { getDeckBySource, createDeck, updateDeck, validateDeckJson } from '../../db/decks.js';
 import { addDeckRepo } from '../../db/profiles.js';
+import { getCachedRepoFiles, setCachedRepoFiles } from '../../db/index.js';
 import { STRINGS } from '../../i18n.js';
 
 export function GitHubModal({ open, onClose, onImport, deckRepos = [], setProfile }) {
@@ -42,6 +43,14 @@ export function GitHubModal({ open, onClose, onImport, deckRepos = [], setProfil
     setError(null);
 
     try {
+      // Check cache first.
+      const cached = await getCachedRepoFiles(src.owner, src.repo, src.path);
+      if (cached) {
+        setFiles(cached.filter((f) => !f.parseError));
+        setFetching(false);
+        return;
+      }
+
       const url = `https://api.github.com/repos/${src.owner}/${src.repo}/contents/${src.path}`;
       const resp = await fetch(url);
 
@@ -113,7 +122,9 @@ export function GitHubModal({ open, onClose, onImport, deckRepos = [], setProfil
         })
       );
 
-      setFiles(fileInfos.filter((f) => !f.parseError));
+      const validFiles = fileInfos.filter((f) => !f.parseError);
+      setFiles(validFiles);
+      await setCachedRepoFiles(src.owner, src.repo, src.path, fileInfos);
     } catch (e) {
       setError(STRINGS.parent.decks.githubImport.errors.networkError);
     }

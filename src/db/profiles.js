@@ -19,40 +19,28 @@ export const DEFAULT_SETTINGS = {
   deckRepos: []
 };
 
-function parseOfficialDeckRepo(envValue) {
-  if (!envValue) return null;
-  const m = envValue.match(/^([^/]+)\/([^/:]+)(?::(.+))?$/);
-  if (!m) return null;
-  return {
-    name: 'Official Decks',
-    repo: `${m[1]}/${m[2]}`,
-    path: m[3] || '',
-    isDefault: true
-  };
-}
+export const OFFICIAL_DECK_REPO = {
+  id: 'official',
+  name: 'Official Decks',
+  repo: 'danazkari/kids-srs',
+  path: 'decks',
+  isDefault: true
+};
 
 export async function getCurrentProfile() {
   const profile = await metaGet(PROFILE_KEY, null);
   if (profile) return profile;
 
-  // Create a default profile.
-  const settings = {
-    ...DEFAULT_SETTINGS,
-    sessionSize: { ...DEFAULT_SETTINGS.sessionSize },
-    timedSession: { ...DEFAULT_SETTINGS.timedSession }
-  };
-
-  // Auto-add official repo from env var on first boot if set and no repos yet
-  const envRepo = parseOfficialDeckRepo(import.meta.env.VITE_OFFICIAL_DECK_REPO);
-  if (envRepo) {
-    settings.deckRepos = [envRepo];
-  }
-
   const fresh = {
     id: PROFILE_KEY,
     name: 'Friend',
     createdAt: Date.now(),
-    settings
+    settings: {
+      ...DEFAULT_SETTINGS,
+      sessionSize: { ...DEFAULT_SETTINGS.sessionSize },
+      timedSession: { ...DEFAULT_SETTINGS.timedSession },
+      deckRepos: [{ ...OFFICIAL_DECK_REPO }]
+    }
   };
   await metaSet(PROFILE_KEY, fresh);
   return fresh;

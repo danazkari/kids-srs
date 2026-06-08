@@ -85,3 +85,29 @@ export async function metaSet(key, value) {
     // ignore
   }
 }
+
+function repoCacheKey(owner, repo, path) {
+  return `repo:${owner}/${repo}:${path}`;
+}
+
+export async function getCachedRepoFiles(owner, repo, path) {
+  try {
+    const db = await getDb();
+    const row = await db.get('meta', repoCacheKey(owner, repo, path));
+    return row ? row.value : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function setCachedRepoFiles(owner, repo, path, files) {
+  try {
+    const db = await getDb();
+    await db.put('meta', {
+      key: repoCacheKey(owner, repo, path),
+      value: { files, cachedAt: Date.now() }
+    });
+  } catch {
+    // ignore
+  }
+}
