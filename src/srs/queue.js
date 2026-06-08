@@ -73,10 +73,11 @@ export function buildSessionQueue({ cards, srsByCardId, sessionSize, now = Date.
       return (aDue ?? Infinity) - (bDue ?? Infinity);
     });
 
-    // Sort new by deck array index (deterministic, no shuffle)
+    // Sort new by deck array index, then shuffle so each loop feels different
     allNew.sort((a, b) => cards.indexOf(a) - cards.indexOf(b));
+    const shuffledNew = shuffle(allNew);
 
-    return [...allDue, ...allNew];
+    return [...allDue, ...shuffledNew];
   }
 
   // Take up to the configured count from each type.

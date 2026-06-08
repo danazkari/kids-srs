@@ -12,7 +12,7 @@ import { newSrsState, applyGrade, GRADE } from '../../srs/algorithm.js';
 import { buildSessionQueue, srsMapFromList } from '../../srs/queue.js';
 import { collectBadgeContext, computeEligibleBadgeIds } from '../../badges/evaluator.js';
 import { listDecks } from '../../db/decks.js';
-import { calcStreak } from '../../utils/index.js';
+import { calcStreak, shuffle } from '../../utils/index.js';
 import { cancelSpeech } from '../../speech/index.js';
 import { ProgressBar } from '../../components/ProgressBar.jsx';
 import { Modal } from '../../components/Modal.jsx';
@@ -216,9 +216,8 @@ export function Session({ deckId, timerMinutes = null, profile, navigate }) {
         total: updated.cardsReviewed
       });
 
-      // If timer expired and this was the last card, end session
-      if (result.advance && timerExpired && index + 1 >= queue.length) {
-        // Timer expired during this card — complete session now
+      // If timer expired and user is ready to move on, end session immediately
+      if (result.advance && timerExpired) {
         await finalizeSession(updated);
         return;
       }
@@ -286,7 +285,8 @@ export function Session({ deckId, timerMinutes = null, profile, navigate }) {
       setQueue([]);
       return;
     }
-    setQueue(q);
+    // Shuffle on each loop pass so the order feels fresh
+    setQueue(timerMinutesRef.current ? shuffle(q) : q);
     setIndex(0);
     setShowRestartOverlay(false);
   }
